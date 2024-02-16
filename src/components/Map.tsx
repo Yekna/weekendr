@@ -43,7 +43,11 @@ const Map = () => {
 
   useEffect(() => {
     const fetchToken = async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/token`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/token`, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
       const { token } = await res.json();
       return token;
     };
