@@ -4,11 +4,14 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import ReactMapGl, {
   LngLatBounds,
   MapRef,
+  Marker,
   ViewState,
   ViewStateChangeEvent,
 } from "react-map-gl";
 import { useLocalStorage } from "usehooks-ts";
 import "mapbox-gl/dist/mapbox-gl.css";
+import Pin from "../../public/pin.png";
+import Sidebar from "./Sidebar";
 
 const Map = () => {
   const mapRef = useRef<MapRef | null>(null);
@@ -27,6 +30,7 @@ const Map = () => {
   });
   const [token, setToken] = useState("");
   const [mapBounds, setMapBounds] = useState<LngLatBounds | null>(null);
+  const [id, setId] = useState<number>(0);
 
   const onMove = useCallback(
     (e: ViewStateChangeEvent) => {
@@ -70,7 +74,22 @@ const Map = () => {
         mapStyle="mapbox://styles/leighhalliday/ckhjaksxg0x2v19s1ovps41ef"
         onMove={onMove}
         onLoad={onLoad}
-      ></ReactMapGl>
+      >
+        <div className="z-10">
+          <Marker latitude={46.09167269144208} longitude={19.66244234405549}>
+            <div
+              data-id={1}
+              className="w-10 h-10 hover:cursor-pointer hover:bg-red-500 bg-white"
+              style={{
+                maskImage: `url(${Pin.src})`, // Tailwind doesn't support mask-image
+                maskMode: "alpha", // Tailwind doesn't support mask-mode
+              }}
+              onClick={() => setId(1)}
+            ></div>
+          </Marker>
+        </div>
+      </ReactMapGl>
+      <Sidebar setId={setId} id={id} />
     </div>
   );
 };
