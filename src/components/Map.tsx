@@ -8,7 +8,7 @@ import ReactMapGl, {
   ViewState,
   ViewStateChangeEvent,
 } from "react-map-gl";
-import { useLocalStorage } from "usehooks-ts";
+import { useLocalStorage, useMediaQuery } from "usehooks-ts";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Pin from "../../public/pin.png";
 import Sidebar from "./Sidebar";
@@ -973,6 +973,7 @@ const Map = () => {
       right: 0,
     },
   });
+  const isSmallScreen = useMediaQuery("(max-width: 640px)");
   const [token, setToken] = useState("");
   const [mapBounds, setMapBounds] = useState<LngLatBounds | null>(null);
   const [id, setId] = useState<string>("");
@@ -1011,24 +1012,28 @@ const Map = () => {
   if (!token) return;
 
   return (
-    <div className="text-black relative">
+    <div
+      style={{ height: "calc(100vh - 64px)" }}
+      className="w-full text-black overflow-hidden flex flex-col-reverse sm:flex-row [&>*]:flex-1"
+    >
+      <Sidebar setId={setId} id={id} isSmallScreen={isSmallScreen} />
       <ReactMapGl
+        style={{ cursor: "grab", flex: isSmallScreen ? 1 : "0 1 auto" }}
         ref={mapRef}
-        style={{ width: "100%", height: "calc(100vh - 64px)", cursor: "grab" }}
         {...viewport}
         mapboxAccessToken={token}
         mapStyle="mapbox://styles/leighhalliday/ckhjaksxg0x2v19s1ovps41ef"
         onMove={onMove}
         onDragEnd={async () => {
-          const { _sw, _ne } = mapBounds as LngLatBounds;
-          const { lat: lat1, lng: lng1 } = _sw;
-          const { lat: lat2, lng: lng2 } = _ne;
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/venues?bounds=${lat1},${lng1}|${lat2},${lng2}`,
-          );
-
-          const data = await res.json();
-          console.log({ data });
+          // const { _sw, _ne } = mapBounds as LngLatBounds;
+          // const { lat: lat1, lng: lng1 } = _sw;
+          // const { lat: lat2, lng: lng2 } = _ne;
+          // const res = await fetch(
+          //   `${process.env.NEXT_PUBLIC_API_URL}/venues?bounds=${lat1},${lng1}|${lat2},${lng2}`,
+          // );
+          //
+          // const data = await res.json();
+          // console.log({ data });
           // const res = await fetch(
           //   `https://maps.googleapis.com/maps/api/place/textsearch/json?query=bar|night_club&key=${process.env.GOOGLE_PLACES_API_KEY}&bounds=${lat1},${lng1}|${lat2},${lng2}`,
           // );
@@ -1051,7 +1056,6 @@ const Map = () => {
           </div>
         ))}
       </ReactMapGl>
-      <Sidebar setId={setId} id={id} />
     </div>
   );
 };

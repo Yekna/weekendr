@@ -2,16 +2,15 @@
 
 import Image from "next/image";
 import { FC, useMemo, useEffect } from "react";
-import { useMediaQuery } from "usehooks-ts";
 import { data } from "./Map";
 
 type Props = {
   setId: (id: string) => void;
   id: string;
+  isSmallScreen: boolean;
 };
 
-const Sidebar: FC<Props> = ({ id, setId }) => {
-  const isSmallScreen = useMediaQuery("(max-width: 640px)");
+const Sidebar: FC<Props> = ({ id, setId, isSmallScreen }) => {
   const venue = useMemo(() => {
     let v;
     for (let i = 0; i < data.length; i++) {
@@ -27,14 +26,11 @@ const Sidebar: FC<Props> = ({ id, setId }) => {
   const changeAbsolutePosition = useMemo(() => {
     if (!isSmallScreen) {
       return {
-        top: 0,
-        width: "408px",
+        flexBasis: "408px",
+        flexShrink: 0,
       };
     }
-    return {
-      right: 0,
-      height: "50%",
-    };
+    return {};
   }, [isSmallScreen]);
 
   useEffect(() => {
@@ -49,7 +45,7 @@ const Sidebar: FC<Props> = ({ id, setId }) => {
   return (
     <aside
       style={{ display: id ? "block" : "none", ...changeAbsolutePosition }}
-      className="absolute left-0 bottom-0 bg-white"
+      className="bg-white overflow-scroll"
     >
       <div className="sm:flex-col-reverse flex-col">
         <Image
@@ -63,12 +59,16 @@ const Sidebar: FC<Props> = ({ id, setId }) => {
           <div className="flex gap-3 mt-2">
             <span>{venue?.rating ? venue.rating : ""}</span>
             <span>
-              {Array.from({ length: Math.round(venue?.rating || 0) }).map((_, i) => (
-                <span key={i}>*</span>
-              ))}
+              {Array.from({ length: Math.round(venue?.rating || 0) }).map(
+                (_, i) => (
+                  <span key={i}>*</span>
+                ),
+              )}
             </span>
             <span>
-              {venue?.user_ratings_total ? `(${venue?.user_ratings_total})` : ""}
+              {venue?.user_ratings_total
+                ? `(${venue?.user_ratings_total})`
+                : ""}
             </span>
           </div>
           <p>
@@ -87,26 +87,27 @@ const Sidebar: FC<Props> = ({ id, setId }) => {
             {venue?.formatted_address}
           </p>
           <p>{venue?.opening_hours?.open_now ? "OPEN" : "CLOSED"}</p>
+
+          <button
+            className="p-3 rounded-full border border-black"
+            style={{ lineHeight: 0 }}
+            onClick={() => setId("")}
+          >
+            <svg
+              stroke="currentColor"
+              fill="currentColor"
+              strokeWidth="0"
+              viewBox="0 0 24 24"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M19.002 3h-14c-1.103 0-2 .897-2 2v4h2V5h14v14h-14v-4h-2v4c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V5c0-1.103-.898-2-2-2z"></path>
+              <path d="m11 16 5-4-5-4v3.001H3v2h8z"></path>
+            </svg>
+          </button>
         </div>
       </div>
-      <button
-        className="absolute right-3 top-3 bg-white p-3 rounded-full border border-black"
-        style={{ lineHeight: 0 }}
-        onClick={() => setId("")}
-      >
-        <svg
-          stroke="currentColor"
-          fill="currentColor"
-          strokeWidth="0"
-          viewBox="0 0 24 24"
-          height="1em"
-          width="1em"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M19.002 3h-14c-1.103 0-2 .897-2 2v4h2V5h14v14h-14v-4h-2v4c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V5c0-1.103-.898-2-2-2z"></path>
-          <path d="m11 16 5-4-5-4v3.001H3v2h8z"></path>
-        </svg>
-      </button>
     </aside>
   );
 };
