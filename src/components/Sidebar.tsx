@@ -1,28 +1,33 @@
 "use client";
 
 import Image from "next/image";
-import { FC, useMemo, useEffect } from "react";
-import { data } from "./Map";
+import { FC, useMemo } from "react";
+// import venues from "@/app/api/venues/data";
 
 type Props = {
-  setId: (id: string) => void;
-  id: string;
   isSmallScreen: boolean;
+  venue: {
+    data: {
+      result: {
+        rating: number;
+        user_ratings_total: number;
+        formatted_address: string;
+        opening_hours: {
+          open_now: boolean;
+          periods: Array<{ close: { day: number; time: string } }>;
+        };
+        formatted_phone_number: string;
+        name: string;
+        photos: Array<{ photo_reference: string }>;
+        user_rating_total: number;
+        vicinity: string;
+        website: string;
+      };
+    };
+  } | null;
 };
 
-const Sidebar: FC<Props> = ({ id, setId, isSmallScreen }) => {
-  const venue = useMemo(() => {
-    let v;
-    for (let i = 0; i < data.length; i++) {
-      if (data[i].place_id === id) {
-        v = data[i];
-        break;
-      }
-    }
-
-    return v;
-  }, [id]);
-
+const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
   const changeAbsolutePosition = useMemo(() => {
     if (!isSmallScreen) {
       return {
@@ -33,18 +38,11 @@ const Sidebar: FC<Props> = ({ id, setId, isSmallScreen }) => {
     return {};
   }, [isSmallScreen]);
 
-  useEffect(() => {
-    const fetchPhoto = async () => {
-      // FETCH ONLY THE PARTS YOU NEED IF YOU'RE GONNA CALL THE MAIN API
-      // await fetch(`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=ATplDJalcgBrBGW3EQyE4uQZQubzPmX1skSZEyp6i2oxn8P9nKo-SkxdQeuvdkbAmi8ccpK9pI95wYo0mFjUlNDX9UoF3uToYQP2wqe_rv9HBJjXVNVilvLqam-SdWOTw2aDmFeSrZufWfMug8KHqJ_cm8HwO2IzCFVuiaqilu3Y60BOT9GZ&key=${process.env.GOOGLE_PLACES_API_KEY}`);
-    };
-
-    fetchPhoto();
-  }, []);
+  if (!venue) return null;
 
   return (
     <aside
-      style={{ display: id ? "block" : "none", ...changeAbsolutePosition }}
+      style={{ ...changeAbsolutePosition }}
       className="bg-white overflow-scroll"
     >
       <div className="sm:flex-col-reverse flex-col">
@@ -55,19 +53,21 @@ const Sidebar: FC<Props> = ({ id, setId, isSmallScreen }) => {
           height={320}
         />
         <div className="p-5">
-          <p className="text-2xl">{venue?.name}</p>
+          <p className="text-2xl">{venue.data.result.name}</p>
           <div className="flex gap-3 mt-2">
-            <span>{venue?.rating ? venue.rating : ""}</span>
             <span>
-              {Array.from({ length: Math.round(venue?.rating || 0) }).map(
-                (_, i) => (
-                  <span key={i}>*</span>
-                ),
-              )}
+              {venue.data.result.rating ? venue.data.result.rating : ""}
             </span>
             <span>
-              {venue?.user_ratings_total
-                ? `(${venue?.user_ratings_total})`
+              {Array.from({
+                length: Math.round(venue.data.result.rating || 0),
+              }).map((_, i) => (
+                <span key={i}>*</span>
+              ))}
+            </span>
+            <span>
+              {venue.data.result.user_ratings_total
+                ? `(${venue.data.result.user_ratings_total})`
                 : ""}
             </span>
           </div>
@@ -84,28 +84,9 @@ const Sidebar: FC<Props> = ({ id, setId, isSmallScreen }) => {
             >
               <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path>
             </svg>{" "}
-            {venue?.formatted_address}
+            {venue.data.result.formatted_address}
           </p>
-          <p>{venue?.opening_hours?.open_now ? "OPEN" : "CLOSED"}</p>
-
-          <button
-            className="p-3 rounded-full border border-black"
-            style={{ lineHeight: 0 }}
-            onClick={() => setId("")}
-          >
-            <svg
-              stroke="currentColor"
-              fill="currentColor"
-              strokeWidth="0"
-              viewBox="0 0 24 24"
-              height="1em"
-              width="1em"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M19.002 3h-14c-1.103 0-2 .897-2 2v4h2V5h14v14h-14v-4h-2v4c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V5c0-1.103-.898-2-2-2z"></path>
-              <path d="m11 16 5-4-5-4v3.001H3v2h8z"></path>
-            </svg>
-          </button>
+          <p>{venue.data.result.opening_hours?.open_now ? "OPEN" : "CLOSED"}</p>
         </div>
       </div>
     </aside>
