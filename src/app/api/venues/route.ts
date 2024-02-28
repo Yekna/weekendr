@@ -1,52 +1,22 @@
 import { LngLatBounds } from "react-map-gl";
 
-// export async function GET(req: Request) {
-//   const xmin = Number(new URL(req.url).searchParams.get("swLat"));
-//   const ymin = Number(new URL(req.url).searchParams.get("swLng"));
-//   const xmax = Number(new URL(req.url).searchParams.get("neLat"));
-//   const ymax = Number(new URL(req.url).searchParams.get("neLng"));
-//   const xCenter = xmax - (xmax - xmin) / 2;
-//   const yCenter = ymax - (ymax - ymin) / 2;
-//
-//   const toRadians = (degree: number) => (degree * Math.PI) / 180;
-//
-//   const lat1 = toRadians(xmin);
-//   const lon1 = toRadians(ymin);
-//   const lat2 = toRadians(xmax);
-//   const lon2 = toRadians(ymax);
-//
-//   const dlat = lat2 - lat1;
-//   const dlon = lon2 - lon1;
-//
-//   const a =
-//     Math.sin(dlat / 2) ** 2 +
-//     Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
-//   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//   const R = 6371000; // EARTH'S RADIUS IN METERS
-//   const distance = (R * c) / 2;
-//   console.log({ distance });
-//   console.log({ xCenter, yCenter });
-//
-//   // const res = await fetch(
-//   //   `https://maps.googleapis.com/maps/api/place/textsearch/json?query=bar|night_club|cafe&key=${process.env.GOOGLE_PLACES_API_KEY}&bounds=${bounds}`,
-//   // );
-//   const res = await fetch(
-//     `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${xCenter},${yCenter}&radius=${distance}&type=night_club|bar|cafe&key=${process.env.GOOGLE_PLACES_API_KEY}&fields=place_id,geometry/location`,
-//   );
-//   const data = await res.json();
-//   // console.log({bounds});
-//   // console.log(data.results);
-//   // console.log(data);
-//
-//   return Response.json(
-//     { data },
-//     {
-//       headers: {
-//         "Access-Control-Allow-Origin": "*",
-//       },
-//     },
-//   );
-// }
+export async function GET(req: Request) {
+  const value = new URL(req.url).searchParams.get("value");
+
+  const res = await fetch(
+    `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?inputtype=textquery&input=${value}&fields=formatted_address,name,place_id&key=${process.env.GOOGLE_PLACES_API_KEY}`,
+  );
+
+  const { candidates } = await res.json();
+  return Response.json(
+    { candidates },
+    {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    },
+  );
+}
 
 export async function POST(req: Request) {
   const { bounds } = (await req.json()) as { bounds: LngLatBounds };
@@ -90,7 +60,7 @@ export async function POST(req: Request) {
         "X-Goog-FieldMask": "places.id,places.location",
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-      } as any,
+      },
       body: JSON.stringify({
         locationRestriction,
         includedTypes: ["bar", "night_club", "cafe"],
