@@ -1,6 +1,4 @@
 import Image from "next/image";
-import Form from "@/components/Form";
-import { registerUser } from "@/actions";
 import { Metadata } from "next";
 import Form2 from "@/components/Form2";
 

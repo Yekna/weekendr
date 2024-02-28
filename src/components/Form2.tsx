@@ -1,9 +1,7 @@
 "use client";
 import { FC, useState } from "react";
 import Input from "./Input";
-import FileUpload from "./FileUpload";
 import Button from "./Button";
-import Select from "./Select";
 import Select2 from "./Select2";
 
 type Props = {};
@@ -11,7 +9,7 @@ type Props = {};
 const Form2: FC<Props> = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [venues, setVenues] = useState([]);
+  const [venues, setVenues] = useState<string[]>([]);
 
   return (
     <div className="w-full">

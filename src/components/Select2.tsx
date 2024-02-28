@@ -1,16 +1,13 @@
 "use client";
 
 import {
-  ChangeEventHandler,
   Dispatch,
   FC,
   KeyboardEvent,
   SetStateAction,
   useCallback,
-  useRef,
   useState,
 } from "react";
-import Input from "./Input";
 
 type Props = {
   values: string[];
