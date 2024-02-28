@@ -60,7 +60,7 @@ export async function POST(req: Request) {
         "X-Goog-FieldMask": "places.id,places.location",
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-      },
+      } as any,
       body: JSON.stringify({
         locationRestriction,
         includedTypes: ["bar", "night_club", "cafe"],
