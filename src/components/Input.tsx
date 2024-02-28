@@ -1,11 +1,17 @@
 "use client";
-import { FC, HTMLInputTypeAttribute, KeyboardEventHandler } from "react";
+import {
+  Dispatch,
+  FC,
+  HTMLInputTypeAttribute,
+  KeyboardEventHandler,
+  SetStateAction,
+} from "react";
 
 type Props = {
   name: string;
   placeholder: string;
   type?: HTMLInputTypeAttribute;
-  onChange?: (value: string) => void;
+  onChange: Dispatch<SetStateAction<string>>;
   value: string;
   onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
 };
