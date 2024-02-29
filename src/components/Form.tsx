@@ -2,14 +2,15 @@
 import { FC, useState } from "react";
 import Input from "./Input";
 import Button from "./Button";
-import Select2 from "./Select2";
+import Select from "./Select";
 
 type Props = {};
 
-const Form2: FC<Props> = () => {
+const Form: FC<Props> = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [venues, setVenues] = useState<string[]>([]);
+  const [message, setMessage] = useState("");
 
   return (
     <div className="w-full">
@@ -28,8 +29,8 @@ const Form2: FC<Props> = () => {
               "Content-Type": "application/json",
             },
           });
-
-          console.log(await res.json());
+          const { message } = await res.json();
+          setMessage(message);
         }}
       >
         <Input
@@ -46,11 +47,12 @@ const Form2: FC<Props> = () => {
           onChange={setPassword}
           placeholder="Password"
         />
-        <Select2 values={venues} setValues={setVenues} />
+        <Select values={venues} setValues={setVenues} />
         <Button>Register</Button>
+        <p className="uppercase">{message}</p>
       </form>
     </div>
   );
 };
 
-export default Form2;
+export default Form;

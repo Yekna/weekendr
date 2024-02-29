@@ -1,4 +1,6 @@
 import { LngLatBounds } from "react-map-gl";
+import prisma from "../../../../prisma/client";
+import { Prisma } from "@prisma/client";
 
 export async function GET(req: Request) {
   const value = new URL(req.url).searchParams.get("value");
@@ -70,11 +72,44 @@ export async function POST(req: Request) {
     },
   );
 
-  const data = await res.json();
+  const { places }: { places: Array<{ id: string }> } = await res.json();
+  const venueIds = places.map(({ id }) => id);
+  const processedVenueIds = new Set();
+  const partyPromises = [];
 
-  return Response.json(data.places, {
-    headers: {
-      "Access-Control-Allow-Origin": "*",
+  // return only the first instance of a venueId that's valid
+  for (let venueId of venueIds) {
+    if (!processedVenueIds.has(venueId)) {
+      const partyPromise = prisma.party.findFirst({
+        where: {
+          venueId,
+          date: {
+            gte: new Date(),
+          },
+        },
+        orderBy: {
+          date: Prisma.SortOrder.asc,
+        },
+        select: {
+          genre: true,
+          venueId: true,
+        },
+      });
+      partyPromises.push(partyPromise);
+      processedVenueIds.add(venueId);
+    }
+  }
+
+  const parties = (await Promise.all(partyPromises)).filter(
+    (party) => party !== null,
+  );
+
+  return Response.json(
+    { places, parties },
+    {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
     },
-  });
+  );
 }

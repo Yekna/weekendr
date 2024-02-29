@@ -3,7 +3,6 @@ import {
   Dispatch,
   FC,
   HTMLInputTypeAttribute,
-  KeyboardEventHandler,
   SetStateAction,
 } from "react";
 
@@ -13,7 +12,6 @@ type Props = {
   type?: HTMLInputTypeAttribute;
   onChange: Dispatch<SetStateAction<string>>;
   value: string;
-  onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
 };
 
 const Input: FC<Props> = ({
@@ -22,7 +20,6 @@ const Input: FC<Props> = ({
   type = "text",
   onChange,
   value,
-  onKeyDown,
 }) => {
   return (
     <input
@@ -32,7 +29,6 @@ const Input: FC<Props> = ({
       className="border border-gray-300 p-2 rounded-md text-black disabled:cursor-not-allowed"
       type={type}
       onChange={(e) => onChange(e.target.value)}
-      onKeyDown={onKeyDown}
     />
   );
 };

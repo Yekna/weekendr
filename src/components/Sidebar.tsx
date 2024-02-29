@@ -47,17 +47,21 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
         <div className="p-5">
           <p className="text-2xl">{venue.displayName.text}</p>
           <div className="flex gap-3 mt-2">
-            <span>{venue.rating ? venue.rating : ""}</span>
-            <span>
-              {Array.from({
-                length: Math.round(venue.rating || 0),
-              }).map((_, i) => (
-                <span key={i}>*</span>
-              ))}
-            </span>
-            <span>
-              {venue.userRatingCount ? `(${venue.userRatingCount})` : ""}
-            </span>
+            {venue.rating && venue.userRatingCount ? (
+              <>
+                <span>{venue.rating}</span>
+                <span>
+                  {Array.from({
+                    length: Math.round(venue.rating),
+                  }).map((_, i) => (
+                    <span key={i}>*</span>
+                  ))}
+                </span>
+                <span>{`(${venue.userRatingCount})`}</span>
+              </>
+            ) : (
+              <p>NO USER REVIEWS</p>
+            )}
           </div>
           <p>
             <svg

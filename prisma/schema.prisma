@@ -27,7 +27,7 @@ model Party {
   picture String
   date    DateTime
   Venue   Venue    @relation(fields: [venueId], references: [id])
-  venueId String   @unique
+  venueId String
 }
 
 model Owner {
@@ -41,7 +41,7 @@ model Owner {
 
 model Venue {
   id           String  @id
-  name         String
+  name         String  @unique
   picture      String?
   address      String  @unique
   parties      Party[]
