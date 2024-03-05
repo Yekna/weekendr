@@ -54,25 +54,72 @@ export async function POST(req: Request) {
       radius,
     },
   };
-  const res = await fetch(
-    "https://places.googleapis.com/v1/places:searchNearby",
-    {
-      headers: {
-        "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
-        "X-Goog-FieldMask": "places.id,places.location",
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      } as any,
-      body: JSON.stringify({
-        locationRestriction,
-        includedTypes: ["bar", "night_club", "cafe"],
-        languageCode: "en", // for some reason without this it defaults to * even though in the docs it says it is en
-      }),
-      method: "POST",
-    },
-  );
 
-  const { places }: { places: Array<{ id: string }> } = await res.json();
+  let {
+    places: clubPlaces,
+  }: {
+    places:
+      | Array<{
+          id: string;
+          location: { latitude: number; longitude: number };
+        }>
+      | undefined;
+  } = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
+    headers: {
+      "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
+      "X-Goog-FieldMask": "places.id,places.location,places.primaryType",
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    } as any,
+    body: JSON.stringify({
+      locationRestriction,
+      includedPrimaryTypes: ["night_club"],
+      languageCode: "en",
+    }),
+    method: "POST",
+  }).then((res) => res.json());
+
+  let {
+    places: barPlaces,
+  }: {
+    places:
+      | Array<{
+          id: string;
+          location: { latitude: number; longitude: number };
+        }>
+      | undefined;
+  } = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
+    headers: {
+      "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
+      "X-Goog-FieldMask": "places.id,places.location,places.primaryType",
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    } as any,
+    body: JSON.stringify({
+      locationRestriction,
+      includedPrimaryTypes: ["bar"],
+      languageCode: "en",
+    }),
+    method: "POST",
+  }).then((res) => res.json());
+
+  const processedVenues = new Set();
+
+  if (!clubPlaces) {
+    clubPlaces = [];
+  }
+  if (!barPlaces) {
+    barPlaces = [];
+  }
+
+  const places = [...clubPlaces, ...barPlaces].filter(({ id }) => {
+    if (!processedVenues.has(id)) {
+      processedVenues.add(id);
+      return true;
+    }
+    return false;
+  });
+
   const venueIds = places.map(({ id }) => id);
   const processedVenueIds = new Set();
   const partyPromises = [];

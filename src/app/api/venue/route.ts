@@ -6,8 +6,13 @@ export async function POST(req: Request) {
     username,
     password,
     venues,
-  }: { username: string; password: string; venues: string[] } =
-    await req.json();
+    taxPictures,
+  }: {
+    username: string;
+    password: string;
+    venues: string[];
+    taxPictures: string[];
+  } = await req.json();
   try {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
@@ -16,7 +21,7 @@ export async function POST(req: Request) {
       data: {
         username,
         password: hashedPassword,
-        taxPictures: [""],
+        taxPictures,
       },
     });
 

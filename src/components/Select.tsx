@@ -1,19 +1,34 @@
 "use client";
 
-import { Dispatch, FC, SetStateAction, useState } from "react";
+import { FormikErrors } from "formik";
+import { FC, useState } from "react";
 import useSWR from "swr";
 import { useDebounceValue } from "usehooks-ts";
 
 type Props = {
   values: string[];
-  setValues: Dispatch<SetStateAction<string[]>>;
+  setValues: (
+    field: string,
+    value: any,
+    shouldValidate?: boolean | undefined,
+  ) =>
+    | Promise<void>
+    | Promise<
+        FormikErrors<{
+          username: string;
+          password: string;
+          venues: never[];
+        }>
+      >;
+  error?: string;
+  disable?: boolean;
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const DEFAULT_DEBOUNCE_TIME = 500;
 
-const Select: FC<Props> = ({ values, setValues }) => {
+const Select: FC<Props> = ({ values, setValues, error, disable = false }) => {
   const [value, setValue] = useState("");
   const [debouncedValue] = useDebounceValue(value, DEFAULT_DEBOUNCE_TIME);
 
@@ -36,9 +51,11 @@ const Select: FC<Props> = ({ values, setValues }) => {
             <span>{value}</span>
             <button
               type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                setValues(values.filter((v) => v !== value));
+              onClick={() => {
+                setValues(
+                  "venues",
+                  values.filter((v) => v !== value),
+                );
               }}
             >
               x
@@ -54,6 +71,7 @@ const Select: FC<Props> = ({ values, setValues }) => {
           readOnly
         />
         <input
+          disabled={disable}
           placeholder="Venue name"
           className="text-black flex-grow p-2 disabled:cursor-not-allowed"
           value={value}
@@ -63,17 +81,21 @@ const Select: FC<Props> = ({ values, setValues }) => {
           type="text"
         />
       </div>
+      {error && <p className="text-red-500 italic">{error}</p>}
       {results &&
         results.candidates.map((result) => (
           <button
             type="button"
             className="border border-black border-solid"
             key={result.place_id}
-            onClick={(e) => {
-              e.preventDefault();
-              setValues((v) => [...v, result.place_id]);
+            onClick={() => {
+              setValues(
+                "venues",
+                values.length
+                  ? [...values, result.place_id]
+                  : [result.place_id],
+              );
               setValue("");
-              // setResults([]);
             }}
           >
             {result.name} ({result.formatted_address})

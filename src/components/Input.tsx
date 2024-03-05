@@ -1,17 +1,15 @@
 "use client";
-import {
-  Dispatch,
-  FC,
-  HTMLInputTypeAttribute,
-  SetStateAction,
-} from "react";
+import { ChangeEvent, FC, HTMLInputTypeAttribute } from "react";
 
 type Props = {
   name: string;
   placeholder: string;
   type?: HTMLInputTypeAttribute;
-  onChange: Dispatch<SetStateAction<string>>;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   value: string;
+  required?: boolean;
+  error?: string;
+  disabled?: boolean;
 };
 
 const Input: FC<Props> = ({
@@ -20,16 +18,24 @@ const Input: FC<Props> = ({
   type = "text",
   onChange,
   value,
+  required = false,
+  error,
+  disabled = false,
 }) => {
   return (
-    <input
-      value={value}
-      placeholder={placeholder}
-      name={name}
-      className="border border-gray-300 p-2 rounded-md text-black disabled:cursor-not-allowed"
-      type={type}
-      onChange={(e) => onChange(e.target.value)}
-    />
+    <>
+      <input
+        disabled={disabled}
+        required={required}
+        value={value}
+        placeholder={placeholder}
+        name={name}
+        className="border border-gray-300 p-2 rounded-md text-black disabled:cursor-not-allowed"
+        type={type}
+        onChange={onChange}
+      />
+      {error && <p className="text-red-500 italic">{error}</p>}
+    </>
   );
 };
 

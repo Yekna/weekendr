@@ -1,22 +1,44 @@
 "use client";
+import { FC } from "react";
+import { UploadDropzone } from "@/utils/uploadthing";
+import { FormikErrors } from "formik";
 
-const FileUpload = () => {
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataURL = reader.result;
-      console.log(dataURL);
-    };
-    reader.readAsDataURL(e.target.files?.[0] as Blob);
-  };
+type Props = {
+  setFieldValue: (
+    field: string,
+    value: any,
+    shouldValidate?: boolean | undefined,
+  ) =>
+    | Promise<void>
+    | Promise<
+        FormikErrors<{
+          username: string;
+          password: string;
+          venues: never[];
+          taxPictures: never[];
+        }>
+      >;
+  error?: string;
+};
 
+const FileUpload: FC<Props> = ({ setFieldValue, error }) => {
   return (
-    <input
-      type="file"
-      name="taxReturns"
-      onChange={handleFileChange}
-      accept="image/*"
-    />
+    <>
+      <UploadDropzone
+        appearance={{
+          container: { border: "2px dashed #fff" },
+          label: { color: "#fff" },
+        }}
+        endpoint="imageUploader"
+        onClientUploadComplete={(e) => {
+          setFieldValue(
+            "taxPictures",
+            e.map(({ url }) => url),
+          );
+        }}
+      />
+      {error && <p className="text-red-500 italic">{error}</p>}
+    </>
   );
 };
 
