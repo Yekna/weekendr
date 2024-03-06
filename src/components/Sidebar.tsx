@@ -25,7 +25,7 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
     if (!isSmallScreen) {
       return {
         top: "64px",
-        right: "calc(100vw - 406px)",
+        right: "calc(100dvw - 406px)",
       };
     }
     return {

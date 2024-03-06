@@ -99,7 +99,7 @@ const Map = () => {
 
   return (
     <div
-      style={{ height: "calc(100vh - 64px)" }}
+      style={{ height: "calc(100dvh - 64px)" }}
       className="text-black overflow-hidden"
     >
       <Sidebar venue={venue} isSmallScreen={isSmallScreen} />

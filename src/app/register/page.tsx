@@ -11,7 +11,7 @@ export default async function Register() {
   return (
     <main
       className="max-w-7xl grid sm:grid-cols-2 place-items-center mx-auto gap-5"
-      style={{ height: "calc(100vh - 64px)" }}
+      style={{ height: "calc(100dvh - 64px)" }}
     >
       <Form />
       {/*TODO: maybe show a screenshot that shows the benefits of registering */}
