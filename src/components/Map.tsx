@@ -196,9 +196,7 @@ const Map = () => {
                     height={35}
                   />
                 )}
-                {viewport.zoom >= 17 && (
-                  <span>{venue.displayName.text}</span>
-                )}
+                <span>{venue.displayName.text}</span>
               </div>
             </Marker>
           ))}
