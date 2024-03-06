@@ -52,6 +52,9 @@ const Map = () => {
     id: string;
     location: { latitude: number; longitude: number };
     primaryType: "night_club" | "bar";
+    displayName: {
+      text: string;
+    };
   }> | null>(null);
   const [parties, setParties] = useState<
     Array<{
@@ -97,11 +100,12 @@ const Map = () => {
   return (
     <div
       style={{ height: "calc(100vh - 64px)" }}
-      className="w-full text-black overflow-hidden flex flex-col-reverse sm:flex-row [&>*]:flex-1"
+      className="text-black overflow-hidden"
     >
       <Sidebar venue={venue} isSmallScreen={isSmallScreen} />
       <ReactMapGl
-        style={{ cursor: "grab", flex: isSmallScreen ? 1 : "0 1 auto" }}
+        minZoom={15}
+        maxZoom={18}
         ref={mapRef}
         {...viewport}
         mapboxAccessToken={data.token}
@@ -165,15 +169,20 @@ const Map = () => {
       >
         {venues &&
           venues.map((venue) => (
-            <div key={venue.id} className="z-10">
-              <Marker
-                latitude={venue.location.latitude}
-                longitude={venue.location.longitude}
+            <Marker
+              key={venue.id}
+              onClick={() => setId(venue.id)}
+              latitude={venue.location.latitude}
+              longitude={venue.location.longitude}
+            >
+              <div
+                className="flex items-center hover:cursor-pointer transition-transform text-white"
+                style={{
+                  transform: id === venue.id ? "scale(1.2)" : "scale(1)",
+                }}
               >
                 {parties.some(({ venueId }) => venueId === venue.id) ? (
                   <Image
-                    className="hover:cursor-pointer text-white"
-                    onClick={() => setId(venue.id)}
                     src={url(venue.id)}
                     alt="Genre"
                     width={50}
@@ -185,12 +194,13 @@ const Map = () => {
                     alt={venue.primaryType}
                     width={35}
                     height={35}
-                    onClick={() => setId(venue.id)}
-                    className="hover:cursor-pointer text-white"
                   />
                 )}
-              </Marker>
-            </div>
+                {viewport.zoom >= 17 && (
+                  <span>{venue.displayName.text}</span>
+                )}
+              </div>
+            </Marker>
           ))}
         {/*{venues &&
           venues.map((d) => (

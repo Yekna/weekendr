@@ -67,7 +67,7 @@ export async function POST(req: Request) {
   } = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
     headers: {
       "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
-      "X-Goog-FieldMask": "places.id,places.location,places.primaryType",
+      "X-Goog-FieldMask": "places.id,places.location,places.primaryType,places.displayName",
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
     } as any,
@@ -91,7 +91,7 @@ export async function POST(req: Request) {
   } = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
     headers: {
       "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
-      "X-Goog-FieldMask": "places.id,places.location,places.primaryType",
+      "X-Goog-FieldMask": "places.id,places.location,places.primaryType,places.displayName",
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
     } as any,
