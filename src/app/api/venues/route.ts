@@ -74,6 +74,7 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       locationRestriction,
       includedPrimaryTypes: ["night_club"],
+      excludedPrimaryTypes: ["restaurant"],
       languageCode: "en",
     }),
     method: "POST",
@@ -98,6 +99,7 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       locationRestriction,
       includedPrimaryTypes: ["bar"],
+      excludedPrimaryTypes: ["restaurant"],
       languageCode: "en",
     }),
     method: "POST",

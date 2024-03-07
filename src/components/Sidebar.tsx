@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { FC, useMemo } from "react";
 import useSWR from "swr";
+import { useLocalStorage } from "usehooks-ts";
+import Button from "./Button";
 
 type Props = {
   isSmallScreen: boolean;
@@ -21,6 +23,7 @@ type Props = {
 };
 
 const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
+  const [following, setFollowing] = useLocalStorage<string[]>("following", []);
   const changeAbsolutePosition = useMemo(() => {
     if (!isSmallScreen) {
       return {
@@ -36,18 +39,27 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
 
   const { data: photo } = useSWR(
     () => {
-      if(!venue) return null;
+      if (!venue) return null;
       return `/api/venues/photo/?NAME=${venue.photos[0].name}`;
     },
     (url: string) => fetch(url).then((res) => res.json()),
   );
 
+  // useEffect(() => {
+  //   // setTimeout(() => {
+  //   //   if (ref.current) {
+  //   //     ref.current.style.transform = "translateX(0)";
+  //   //   }
+  //   // }, 1000);
+  // });
+
   if (!venue || !photo) return;
 
   return (
     <aside
+      // try using state to set translateX(-100% | 0%)
       style={{ ...changeAbsolutePosition }}
-      className="bg-white overflow-scroll z-20 left-0 bottom-0 absolute"
+      className="bg-white overflow-scroll z-20 left-0 bottom-0 absolute transition-transform"
     >
       <div className="flex flex-col-reverse sm:flex-col">
         <Image
@@ -56,7 +68,7 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
           width={640}
           height={320}
         />
-        <div className="p-5">
+        <div className="p-5 flex flex-col">
           <h1 className="text-2xl">{venue.displayName.text}</h1>
           <div className="flex gap-3 mt-2">
             {venue.rating && venue.userRatingCount ? (
@@ -90,17 +102,31 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
             </svg>{" "}
             {venue.formattedAddress}
           </p>
+          {venue.websiteUri && (
+            <a
+              href={venue.websiteUri}
+              className="hover:underline"
+              target="_blank"
+            >
+              {venue.websiteUri}
+            </a>
+          )}
+          <Button
+            className="mt-3"
+            onClick={() =>
+              setFollowing((ids) =>
+                ids.length
+                  ? following.find((f) => f === venue.id)
+                    ? following.filter((f) => f !== venue.id)
+                    : [...ids, venue.id]
+                  : [venue.id],
+              )
+            }
+          >
+            {following.find((f) => f === venue.id) ? "Following" : "Follow"}
+          </Button>
         </div>
       </div>
-      {venue.websiteUri && (
-        <a
-          href={venue.websiteUri}
-          className="p-5 hover:underline"
-          target="_blank"
-        >
-          {venue.websiteUri}
-        </a>
-      )}
     </aside>
   );
 };
