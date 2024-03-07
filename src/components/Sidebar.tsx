@@ -53,7 +53,7 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
   //   // }, 1000);
   // });
 
-  if (!venue || !photo) return;
+  if (!venue) return;
 
   return (
     <aside
@@ -63,7 +63,7 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
     >
       <div className="flex flex-col-reverse sm:flex-col">
         <Image
-          src={photo || ""}
+          src={photo || "/placeholder.png"}
           alt="Venue Thumbnail"
           width={640}
           height={320}
