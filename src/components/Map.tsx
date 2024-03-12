@@ -216,7 +216,10 @@ const Map = () => {
         <div className="absolute top-10 right-10 flex flex-col">
           {isSmallScreen ? (
             <button
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                setId("");
+                setOpen(true);
+              }}
               className="bg-white px-3 py-1"
             >
               Search for location...
