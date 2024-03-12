@@ -1,12 +1,12 @@
 "use client";
 import { FC, useState } from "react";
-import Input from "./Input";
 import Button from "./Button";
-import Select from "./Select";
+import Select from "./Select2";
 import { useFormik } from "formik";
 import z from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import FileUpload from "./FileUpload";
+import Input from "./Input2";
 
 type Props = {};
 
@@ -20,11 +20,10 @@ const validationSchema = z.object({
   venues: z
     .array(z.string().min(27))
     .min(1, { message: "At least 1 venue needs to be selected" }),
-  taxPictures: z
-    .array(z.string().url())
-    .min(1, {
-      message: "At least 1 picture needs to be sent of your tax returns",
-    }),
+  taxPictures: z.array(z.string().url()).min(1, {
+    message:
+      "At least 1 picture needs to be sent of your tax returns. Once you've chosen your picture(s) click on 'Upload n file(s)'",
+  }),
 });
 
 const Form: FC<Props> = () => {
@@ -88,6 +87,7 @@ const Form: FC<Props> = () => {
           error={errors.password}
         />
         <Select
+          placeholder="Venue"
           error={errors.venues ? (errors.venues as string) : ""}
           disable={isValidating}
           values={values.venues}

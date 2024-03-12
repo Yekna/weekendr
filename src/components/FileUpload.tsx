@@ -23,7 +23,7 @@ type Props = {
 
 const FileUpload: FC<Props> = ({ setFieldValue, error }) => {
   return (
-    <>
+    <div>
       <UploadDropzone
         appearance={{
           container: { border: "2px dashed #fff" },
@@ -38,7 +38,7 @@ const FileUpload: FC<Props> = ({ setFieldValue, error }) => {
         }}
       />
       {error && <p className="text-red-500 italic">{error}</p>}
-    </>
+    </div>
   );
 };
 

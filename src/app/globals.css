@@ -32,3 +32,34 @@ body {
     text-wrap: balance;
   }
 }
+
+.bar {
+  position: relative;
+  display: block;
+}
+
+.bar:before,
+.bar:after {
+  content: "";
+  height: 2px;
+  width: 0;
+  bottom: 1px;
+  position: absolute;
+  background: #5264ae;
+  transition: 0.2s ease width;
+  -moz-transition: 0.2s ease width;
+  -webkit-transition: 0.2s ease width;
+}
+
+.bar:before {
+  left: 50%;
+}
+
+.bar:after {
+  right: 50%;
+}
+
+input:focus ~ .bar:before,
+input:focus ~ .bar:after {
+  width: 50%;
+}

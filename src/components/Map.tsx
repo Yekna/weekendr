@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import ReactMapGl, {
   MapRef,
   Marker,
@@ -13,6 +13,10 @@ import Sidebar from "./Sidebar";
 import useSWR from "swr";
 import { Party } from "@prisma/client";
 import Image from "next/image";
+import Modal from "react-modal";
+import Input from "./Input";
+import { useDebounceValue } from "usehooks-ts";
+import Button from "./Button";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -33,21 +37,11 @@ const Map = () => {
   });
   const isSmallScreen = useMediaQuery("(max-width: 640px)");
 
+  const [location, setLocation] = useState("");
+  const [debouncedLocation] = useDebounceValue(location, 500);
+  const [isOpen, setOpen] = useState(false);
   const [id, setId] = useState<string>("");
-  // const [venues, setVenues] = useState<Array<{
-  //   geometry: {
-  //     location: { lat: number; lng: number };
-  //     viewport: {
-  //       northeast: { lat: number; lng: number };
-  //       southwest: {
-  //         lat: number;
-  //         lng: number;
-  //       };
-  //     };
-  //   };
-  //   place_id: string;
-  //   icon: string;
-  // }> | null>(null);
+  const [revalidate, setRevalidate] = useState(false);
   const [venues, setVenues] = useState<Array<{
     id: string;
     location: { latitude: number; longitude: number };
@@ -94,6 +88,55 @@ const Map = () => {
     if (!id) return null;
     return `/api/venues/${id}`;
   }, fetcher);
+  const { data: fetchedLocationData } = useSWR<{
+    results: Array<{
+      formatted_address: string;
+      geometry: {
+        location: { lat: number; lng: number };
+        viewport: {
+          northeast: { lat: number; lng: number };
+          southwest: { lat: number; lng: number };
+        };
+      };
+      name: string;
+    }>;
+  }>(() => {
+    if (!debouncedLocation) return null;
+    return `/api/location/?query=${debouncedLocation}`;
+  }, fetcher);
+
+  useEffect(() => {
+    const refetchData = async () => {
+      if (revalidate) {
+        if (mapRef.current) {
+          const res = await fetch(`/api/venues`, {
+            method: "POST",
+            body: JSON.stringify({
+              bounds: mapRef.current.getMap().getBounds(),
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          const { places, parties } = await res.json();
+          setVenues(places);
+          setParties(parties);
+        }
+        setRevalidate(false);
+      }
+    };
+
+    refetchData();
+  }, [revalidate]);
+
+  const changeViewport = useCallback(
+    async (latitude: number, longitude: number) => {
+      setViewport((v) => ({ ...v, latitude, longitude }));
+      setLocation("");
+      setRevalidate(true);
+    },
+    [setViewport],
+  );
 
   if (!data) return;
 
@@ -102,8 +145,34 @@ const Map = () => {
       style={{ height: "calc(100dvh - 64px)" }}
       className="text-black overflow-hidden"
     >
+      <Modal isOpen={isOpen} onRequestClose={() => setOpen(false)}>
+        <Input
+          name="location"
+          placeholder="Location..."
+          onChange={(e) => setLocation(e.target.value)}
+          value={location}
+        />
+        {fetchedLocationData &&
+          fetchedLocationData.results.map((data) => (
+            <Button
+              className="text-black"
+              key={data.formatted_address}
+              onClick={() => {
+                setViewport((viewport) => ({
+                  ...viewport,
+                  latitude: data.geometry.location.lat,
+                  longitude: data.geometry.location.lng,
+                }));
+                setOpen(false);
+              }}
+            >
+              {data.formatted_address}
+            </Button>
+          ))}
+      </Modal>
       <Sidebar venue={venue} isSmallScreen={isSmallScreen} />
       <ReactMapGl
+        style={{ position: "relative" }}
         minZoom={15}
         maxZoom={18}
         ref={mapRef}
@@ -126,17 +195,6 @@ const Map = () => {
             setVenues(places);
             setParties(parties);
           }
-          // if (mapRef.current) {
-          //   const {
-          //     _ne: { lng: neLng, lat: neLat },
-          //     _sw: { lng: swLng, lat: swLat },
-          //   } = mapRef.current.getMap().getBounds();
-          //   const { places, parties } = await fetch(
-          //     `/api/test/?neLng=${neLng}&neLat=${neLat}&swLng=${swLng}&swLat=${swLat}`,
-          //   ).then((res) => res.json());
-          //   setVenues(places);
-          //   setParties(parties);
-          // }
         }}
         onMoveEnd={async () => {
           if (mapRef.current) {
@@ -153,20 +211,41 @@ const Map = () => {
             setVenues(places);
             setParties(parties);
           }
-
-          // if (mapRef.current) {
-          //   const {
-          //     _ne: { lng: neLng, lat: neLat },
-          //     _sw: { lng: swLng, lat: swLat },
-          //   } = mapRef.current.getMap().getBounds();
-          //   const { places, parties } = await fetch(
-          //     `/api/test/?neLng=${neLng}&neLat=${neLat}&swLng=${swLng}&swLat=${swLat}`,
-          //   ).then((res) => res.json());
-          //   setVenues(places);
-          //   setParties(parties);
-          // }
         }}
       >
+        <div className="absolute top-10 right-10 flex flex-col">
+          {isSmallScreen ? (
+            <button
+              onClick={() => setOpen(true)}
+              className="bg-white px-3 py-1"
+            >
+              Search for location...
+            </button>
+          ) : (
+            <>
+              <Input
+                name="location"
+                placeholder="Location..."
+                onChange={(e) => setLocation(e.target.value)}
+                value={location}
+              />
+              {fetchedLocationData &&
+                fetchedLocationData.results.map((data) => (
+                  <Button
+                    key={data.formatted_address}
+                    onClick={() =>
+                      changeViewport(
+                        data.geometry.location.lat,
+                        data.geometry.location.lng,
+                      )
+                    }
+                  >
+                    {data.formatted_address}
+                  </Button>
+                ))}
+            </>
+          )}
+        </div>
         {venues &&
           venues.map((venue) => (
             <Marker
@@ -200,41 +279,7 @@ const Map = () => {
               </div>
             </Marker>
           ))}
-        {/*{venues &&
-          venues.map((d) => (
-            <div key={d.place_id} className="z-10">
-              <Marker
-                latitude={d.geometry.location.lat}
-                longitude={d.geometry.location.lng}
-              >
-                {parties.some(({ venueId }) => venueId === d.place_id) ? (
-                  <Image
-                    className="hover:cursor-pointer text-white"
-                    onClick={() => setId(d.place_id)}
-                    src={url(d.place_id)}
-                    alt="Genre"
-                    width={50}
-                    height={50}
-                  />
-                ) : (
-                  <Image
-                    src={d.icon}
-                    alt={d.place_id}
-                    width={25}
-                    height={25}
-                    className="hover:cursor-pointer"
-                    onClick={() => setId(d.place_id)}
-                  />
-                )}
-              </Marker>
-            </div>
-          ))}*/}
       </ReactMapGl>
-      {/*<div
-        className="w-10 h-10 hover:cursor-pointer hover:bg-red-500 bg-white"
-        style={{ maskImage: `url(${Pin.src})`, maskMode: "alpha" }}
-        onClick={() => setId(d.place_id)}
-      ></div>*/}
     </div>
   );
 };
