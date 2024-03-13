@@ -1,5 +1,5 @@
 "use client";
-import { ChangeEvent, FC, HTMLInputTypeAttribute } from "react";
+import { CSSProperties, ChangeEvent, FC, HTMLInputTypeAttribute } from "react";
 
 type Props = {
   name: string;
@@ -10,6 +10,7 @@ type Props = {
   required?: boolean;
   error?: string;
   disabled?: boolean;
+  style?: CSSProperties;
 };
 
 const Input: FC<Props> = ({
@@ -21,16 +22,18 @@ const Input: FC<Props> = ({
   required = false,
   error,
   disabled = false,
+  style,
 }) => {
   return (
     <>
       <input
+        style={style}
         disabled={disabled}
         required={required}
         value={value}
         placeholder={placeholder}
         name={name}
-        className="border border-gray-300 p-2 rounded-md text-black disabled:cursor-not-allowed"
+        className="border border-gray-300 p-2 rounded-md text-black disabled:cursor-not-allowed outline-none"
         type={type}
         onChange={onChange}
       />

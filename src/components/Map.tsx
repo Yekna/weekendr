@@ -13,7 +13,6 @@ import Sidebar from "./Sidebar";
 import useSWR from "swr";
 import { Party } from "@prisma/client";
 import Image from "next/image";
-import Modal from "react-modal";
 import Input from "./Input";
 import { useDebounceValue } from "usehooks-ts";
 import Button from "./Button";
@@ -39,7 +38,6 @@ const Map = () => {
 
   const [location, setLocation] = useState("");
   const [debouncedLocation] = useDebounceValue(location, 500);
-  const [isOpen, setOpen] = useState(false);
   const [id, setId] = useState<string>("");
   const [revalidate, setRevalidate] = useState(false);
   const [venues, setVenues] = useState<Array<{
@@ -145,31 +143,6 @@ const Map = () => {
       style={{ height: "calc(100dvh - 64px)" }}
       className="text-black overflow-hidden"
     >
-      <Modal isOpen={isOpen} onRequestClose={() => setOpen(false)}>
-        <Input
-          name="location"
-          placeholder="Location..."
-          onChange={(e) => setLocation(e.target.value)}
-          value={location}
-        />
-        {fetchedLocationData &&
-          fetchedLocationData.results.map((data) => (
-            <Button
-              className="text-black"
-              key={data.formatted_address}
-              onClick={() => {
-                setViewport((viewport) => ({
-                  ...viewport,
-                  latitude: data.geometry.location.lat,
-                  longitude: data.geometry.location.lng,
-                }));
-                setOpen(false);
-              }}
-            >
-              {data.formatted_address}
-            </Button>
-          ))}
-      </Modal>
       <Sidebar venue={venue} isSmallScreen={isSmallScreen} />
       <ReactMapGl
         style={{ position: "relative" }}
@@ -213,41 +186,41 @@ const Map = () => {
           }
         }}
       >
-        <div className="absolute top-10 right-10 flex flex-col">
-          {isSmallScreen ? (
-            <button
-              onClick={() => {
-                setId("");
-                setOpen(true);
-              }}
-              className="bg-white px-3 py-1"
-            >
-              Search for location...
-            </button>
-          ) : (
-            <>
-              <Input
-                name="location"
-                placeholder="Location..."
-                onChange={(e) => setLocation(e.target.value)}
-                value={location}
-              />
-              {fetchedLocationData &&
-                fetchedLocationData.results.map((data) => (
-                  <Button
-                    key={data.formatted_address}
-                    onClick={() =>
-                      changeViewport(
-                        data.geometry.location.lat,
-                        data.geometry.location.lng,
-                      )
-                    }
-                  >
-                    {data.formatted_address}
-                  </Button>
-                ))}
-            </>
-          )}
+        <div
+          className="absolute z-50 flex flex-col"
+          style={{
+            top: isSmallScreen ? "0" : "2.5rem",
+            left: isSmallScreen ? "0" : "2.5rem",
+            width: isSmallScreen ? "100%" : "326px" 
+          }}
+        >
+          <Input
+            name="location"
+            placeholder="Location..."
+            onChange={(e) => setLocation(e.target.value)}
+            value={location}
+            style={{
+              borderBottomRightRadius: location ? "0" : "0.375rem",
+              borderBottomLeftRadius: location ? "0" : "0.375rem",
+            }}
+          />
+          <div className="rounded-b-md overflow-hidden">
+            {fetchedLocationData &&
+              fetchedLocationData.results.map((data) => (
+                <Button
+                  className="rounded-t-none w-full hover:bg-gray-700"
+                  key={data.formatted_address}
+                  onClick={() =>
+                    changeViewport(
+                      data.geometry.location.lat,
+                      data.geometry.location.lng,
+                    )
+                  }
+                >
+                  {data.formatted_address}
+                </Button>
+              ))}
+          </div>
         </div>
         {venues &&
           venues.map((venue) => (
