@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <header className="bg-gray-800 px-6 flex items-center justify-between h-16">
+    <header className="fixed bottom-0 left-0 right-0 sm:static bg-gray-800 px-6 flex items-center justify-between h-16">
       <Link href="/">
         <Image priority={true} alt="Weekendr Logo" src="logo.svg" width={50} height={50} />
       </Link>
@@ -14,6 +14,9 @@ const Header = () => {
           </li>
           <li>
             <Link href="/register">Register</Link>
+          </li>
+          <li>
+            <Link href='/login'>Login</Link>
           </li>
         </ul>
       </nav>

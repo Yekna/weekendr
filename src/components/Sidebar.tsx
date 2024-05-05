@@ -29,11 +29,13 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
       return {
         top: "64px",
         right: "calc(100dvw - 406px)",
+        bottom: 0,
       };
     }
     return {
       right: 0,
       top: "50%",
+      bottom: "calc(64px)"
     };
   }, [isSmallScreen]);
 
@@ -59,7 +61,7 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
     <aside
       // try using state to set translateX(-100% | 0%)
       style={{ ...changeAbsolutePosition }}
-      className="bg-white overflow-scroll z-20 left-0 bottom-0 absolute transition-transform"
+      className="bg-white overflow-scroll z-20 left-0 absolute transition-transform"
     >
       <div className="flex flex-col-reverse sm:flex-col">
         <Image

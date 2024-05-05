@@ -1,7 +1,7 @@
 "use client";
 
 import { FormikErrors } from "formik";
-import { FC, useState } from "react";
+import { FC, FocusEventHandler, useState } from "react";
 import useSWR from "swr";
 import { useDebounceValue } from "usehooks-ts";
 import { Spinner } from "./Spinner";
@@ -24,6 +24,8 @@ type Props = {
       >;
   error?: string;
   disable?: boolean;
+  touched?: boolean;
+  onBlur: FocusEventHandler<HTMLInputElement>;
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -36,6 +38,8 @@ const Select: FC<Props> = ({
   error,
   disable = false,
   placeholder,
+  touched,
+  onBlur,
 }) => {
   const [value, setValue] = useState("");
   const [focused, setFocused] = useState(false);
@@ -64,7 +68,11 @@ const Select: FC<Props> = ({
           readOnly
         />
         <input
-          onBlur={() => setFocused(false)}
+          id="venues"
+          onBlur={(e) => {
+            onBlur(e);
+            setFocused(false);
+          }}
           onFocus={() => setFocused(true)}
           disabled={disable}
           className="text-[16px] p-[10px] pl-[5px] block w-full border-b border-b-[#515151] bg-transparent focus:outline-none"
@@ -131,7 +139,7 @@ const Select: FC<Props> = ({
           </button>
         </div>
       ))}
-      {error && <p className="text-red-500 italic">{error}</p>}
+      {error && touched && <p className="text-red-500 italic">{error}</p>}
     </div>
   );
 };

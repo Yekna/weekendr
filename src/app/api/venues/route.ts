@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 export async function GET(req: Request) {
   const value = new URL(req.url).searchParams.get("value");
 
+  // TODO: remove cities from being returned
   const res = await fetch(
     `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?inputtype=textquery&input=${value}&fields=formatted_address,name,place_id&key=${process.env.GOOGLE_PLACES_API_KEY}`,
   );
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
     Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const R = 6371000; // EARTH'S RADIUS IN METERS
-  const radius = (R * c) / 2; // NEEDS SOME FINE TUNING
+  const radius = (R * c) / 2; // TODO: NEEDS SOME FINE TUNING
 
   const locationRestriction = {
     circle: {
@@ -98,7 +99,7 @@ export async function POST(req: Request) {
     } as any,
     body: JSON.stringify({
       locationRestriction,
-      includedPrimaryTypes: ["bar"],
+      includedPrimaryTypes: ["bar"], // FOR SOME DUMB REASON SOME RESTAURANTS SET THEMSLEVES AS BARS SO THEY'RE ALSO RETURNED
       excludedPrimaryTypes: ["restaurant"],
       languageCode: "en",
     }),

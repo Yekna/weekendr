@@ -191,7 +191,7 @@ const Map = () => {
           style={{
             top: isSmallScreen ? "0" : "2.5rem",
             left: isSmallScreen ? "0" : "2.5rem",
-            width: isSmallScreen ? "100%" : "326px" 
+            width: isSmallScreen ? "100%" : "326px",
           }}
         >
           <Input
@@ -222,7 +222,7 @@ const Map = () => {
               ))}
           </div>
         </div>
-        {venues &&
+        {venues ? (
           venues.map((venue) => (
             <Marker
               key={venue.id}
@@ -254,7 +254,12 @@ const Map = () => {
                 <span>{venue.displayName.text}</span>
               </div>
             </Marker>
-          ))}
+          ))
+        ) : (
+          <div className="absolute -translate-x-1/2 left-1/2 -translate-y-1/2 top-1/2 text-white font-extrabold">
+            Loading........
+          </div>
+        )}
       </ReactMapGl>
     </div>
   );

@@ -1,12 +1,11 @@
 "use client";
+import { useFormik, Formik } from "formik";
 import { FC, useState } from "react";
-import Button from "./Button";
-import Select from "./Select2";
-import { useFormik } from "formik";
-import z from "zod";
+import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import FileUpload from "./FileUpload";
 import Input from "./Input2";
+import Button from "./Button";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
@@ -17,56 +16,51 @@ const validationSchema = z.object({
   password: z
     .string({ required_error: "Password is required" })
     .min(10, { message: "Password needs to be at least 10 characters long" }),
-  venues: z
-    .array(z.string().min(27))
-    .min(1, { message: "At least 1 venue needs to be selected" }),
-  taxPictures: z.array(z.string().url()).min(1, {
-    message:
-      "At least 1 picture needs to be sent of your tax returns. Once you've chosen your picture(s) click on 'Upload n file(s)'",
-  }),
 });
 
-const Form: FC<Props> = () => {
+const Form: FC<Props> = ({}) => {
+  const router = useRouter();
+  const [message, setMessage] = useState("");
   const {
-    values,
-    errors,
-    handleChange,
     handleSubmit,
+    touched,
+    handleBlur,
+    isValidating,
+    errors,
+    values,
+    handleChange,
+    isValid,
     isSubmitting,
     dirty,
-    isValid,
-    isValidating,
-    setFieldValue,
-    handleBlur,
-    touched,
   } = useFormik({
     initialValues: {
       username: "",
       password: "",
-      venues: [] as string[],
-      taxPictures: [] as string[],
     },
-    onSubmit: async ({ username, password, venues, taxPictures }) => {
-      const res = await fetch("/api/venue", {
+    onSubmit: async ({ username, password }) => {
+      const res = await fetch("/api/login", {
         method: "POST",
-        body: JSON.stringify({ username, password, venues, taxPictures }),
+        body: JSON.stringify({
+          username,
+          password,
+        }),
         headers: {
           "Content-Type": "application/json",
         },
       });
-      const { message } = await res.json();
-      setMessage(message);
+      const { message, success } = await res.json();
+      if (success) {
+        router.push("/");
+      } else {
+        setMessage(message);
+      }
     },
     validationSchema: toFormikValidationSchema(validationSchema),
   });
-  const [message, setMessage] = useState("");
 
   return (
     <div className="w-full">
-      <h1 className="mb-5 text-4xl tracking-wide font-bold">
-        Stand Out From The Crowd. <br />
-        Register your venue.
-      </h1>
+      <h1 className="mb-5 text-4xl tracking-wide font-bold">Login</h1>
       <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
         <Input
           touched={touched.username}
@@ -92,24 +86,11 @@ const Form: FC<Props> = () => {
           placeholder="Password"
           error={errors.password}
         />
-        <Select
-          touched={touched.venues}
-          onBlur={handleBlur}
-          placeholder="Venue"
-          error={errors.venues ? (errors.venues as string) : ""}
-          disable={isValidating}
-          values={values.venues}
-          setValues={setFieldValue}
-        />
-        <FileUpload
-          error={errors.taxPictures ? (errors.taxPictures as string) : ""}
-          setFieldValue={setFieldValue}
-        />
         <Button
           disabled={isValidating || !isValid || isSubmitting || !dirty}
           type="submit"
         >
-          Register
+          Login
         </Button>
         <p className="uppercase">{message}</p>
       </form>

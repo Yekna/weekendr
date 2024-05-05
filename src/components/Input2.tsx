@@ -1,5 +1,11 @@
 "use client";
-import { ChangeEvent, FC, HTMLInputTypeAttribute, useState } from "react";
+import {
+  ChangeEvent,
+  FC,
+  FocusEventHandler,
+  HTMLInputTypeAttribute,
+  useState,
+} from "react";
 
 type Props = {
   error?: string;
@@ -10,6 +16,8 @@ type Props = {
   required?: boolean;
   type?: HTMLInputTypeAttribute;
   disabled?: boolean;
+  touched?: boolean;
+  onBlur: FocusEventHandler<HTMLInputElement>;
 };
 
 const Input: FC<Props> = ({
@@ -21,12 +29,18 @@ const Input: FC<Props> = ({
   type = "text",
   error,
   disabled = false,
+  touched,
+  onBlur,
 }) => {
+  // TODO: chrome loses focus on the input for every keystroke
   const [focused, setFocused] = useState(false);
   return (
     <div className="relative">
       <input
-        onBlur={() => setFocused(false)}
+        onBlur={(e) => {
+          setFocused(false);
+          onBlur(e);
+        }}
         onFocus={() => setFocused(true)}
         disabled={disabled}
         type={type}
@@ -57,7 +71,7 @@ const Input: FC<Props> = ({
           </span>
         ))}
       </label>
-      {error && <p className="text-red-500 italic">{error}</p>}
+      {error && touched && <p className="text-red-500 italic">{error}</p>}
     </div>
   );
 };
