@@ -65,7 +65,6 @@ const Form: FC<Props> = ({}) => {
         <Input
           touched={touched.username}
           onBlur={handleBlur}
-          disabled={isValidating}
           error={errors.username}
           required={true}
           type="text"
@@ -77,7 +76,6 @@ const Form: FC<Props> = ({}) => {
         <Input
           touched={touched.password}
           onBlur={handleBlur}
-          disabled={isValidating}
           required={true}
           type="password"
           name="password"
