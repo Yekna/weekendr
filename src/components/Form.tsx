@@ -67,7 +67,7 @@ const Form: FC<Props> = () => {
         Stand Out From The Crowd. <br />
         Register your venue.
       </h1>
-      <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-5 sm:mb-0 mb-20" onSubmit={handleSubmit}>
         <Input
           touched={touched.username}
           onBlur={handleBlur}
