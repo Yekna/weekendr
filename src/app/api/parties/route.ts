@@ -5,7 +5,9 @@ export async function POST(req: Request) {
 
   const parties = await prisma.party.findMany({
     where: {
-      venueId: { in: following },
+      venueId: {
+        in: following,
+      },
     },
     include: {
       Venue: {

@@ -24,12 +24,12 @@ const Parties = () => {
   >("/api/parties/", (url: string) =>
     fetch(url, {
       method: "POST",
-      body: JSON.stringify(following),
+      body: JSON.stringify({ following }),
       headers: { "Content-Type": "application/json" },
     }).then((res) => res.json()),
   );
 
-  if(!data) return <div>Loading...</div>
+  if (!data) return <div>Loading...</div>;
 
   return (
     <ul>
