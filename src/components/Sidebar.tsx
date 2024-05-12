@@ -19,6 +19,8 @@ type Props = {
     rating: number;
     websiteUri: string;
     userRatingCount: number;
+    nationalPhoneNumber: string;
+    internationalPhoneNumber: string;
   };
 };
 
@@ -35,7 +37,7 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
     return {
       right: 0,
       top: "50%",
-      bottom: "calc(64px)"
+      bottom: "calc(64px)",
     };
   }, [isSmallScreen]);
 
@@ -112,6 +114,14 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
               target="_blank"
             >
               {venue.websiteUri}
+            </a>
+          )}
+          {venue.internationalPhoneNumber && (
+            <a
+              href={`tel:${venue.internationalPhoneNumber}`}
+              className="hover:underline"
+            >
+              {venue.internationalPhoneNumber}
             </a>
           )}
           <Button
