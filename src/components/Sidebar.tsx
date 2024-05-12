@@ -63,14 +63,15 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
       style={{ ...changeAbsolutePosition }}
       className="bg-white overflow-scroll z-20 left-0 absolute transition-transform"
     >
-      <div className="flex flex-col-reverse sm:flex-col">
+      <div className="flex flex-col-reverse sm:flex-col sm:p-0 p-5">
         <Image
           src={photo || "/placeholder.png"}
           alt="Venue Thumbnail"
           width={640}
           height={320}
+          className="rounded-xl sm:rounded-none"
         />
-        <div className="p-5 flex flex-col">
+        <div className="sm:p-5 pb-5 flex flex-col">
           <h1 className="text-2xl">{venue.displayName.text}</h1>
           <div className="flex gap-3 mt-2">
             {venue.rating && venue.userRatingCount ? (
