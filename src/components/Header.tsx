@@ -16,32 +16,13 @@ const Header = () => {
       <nav>
         <ul className="flex gap-3 items-center">
           <li>
-            <Link href="/following" className="flex flex-col items-center">
-              <Image
-                alt="Following"
-                src="/following.svg"
-                width={50}
-                height={50}
-              />
-              Following
-            </Link>
+            <Link href="/following">Following</Link>
           </li>
           <li>
-            <Link href="/register" className="flex flex-col items-center">
-              <Image
-                alt="Register"
-                src="/register.svg"
-                width={50}
-                height={50}
-              />
-              Register
-            </Link>
+            <Link href="/register">Register</Link>
           </li>
           <li>
-            <Link href="/login" className="flex flex-col items-center">
-              <Image alt="Login" src="/login.svg" width={50} height={50} />
-              Login
-            </Link>
+            <Link href="/login">Login</Link>
           </li>
         </ul>
       </nav>
