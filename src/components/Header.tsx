@@ -14,7 +14,7 @@ const Header = () => {
         />
       </Link>
       <nav>
-        <ul className="flex gap-3 items-center">
+        <ul className="flex gap-3 items-center sm:text-base text-sm">
           <li>
             <Link href="/following">Following</Link>
           </li>
