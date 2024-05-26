@@ -4,7 +4,7 @@ import Form from "@/components/Form";
 
 export const metadata: Metadata = {
   title: "Register",
-  description: "Register your venue",
+  description: "Register your venue at Weekendr",
 };
 
 export default async function Register() {

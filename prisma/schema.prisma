@@ -37,6 +37,7 @@ model Owner {
   taxPictures String[]
   venues      Venue[]
   verified    Boolean  @default(false)
+  slug        String?
 }
 
 model Venue {
@@ -51,4 +52,12 @@ model Venue {
   rating       Int
   website      String?
   ratingsCount Int
+  slug         String?
+  followers    Int     @default(0)
+  posts        Int     @default(0)
+  about        String?
+  lat          Float?
+  lng          Float?
+
+  @@index([lat, lng], name: "venue_location")
 }

@@ -32,7 +32,6 @@ const Input: FC<Props> = ({
   touched,
   onBlur,
 }) => {
-  // TODO: chrome loses focus on the input for every keystroke
   const [focused, setFocused] = useState(false);
   return (
     <div className="relative">

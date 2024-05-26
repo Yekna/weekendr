@@ -28,11 +28,10 @@ export async function POST(req: Request) {
 
     const promisesVenues: Array<Promise<any>> = [];
 
-
     venues!.forEach((venue) => {
       promisesVenues.push(
         fetch(
-          `https://places.googleapis.com/v1/places/${venue}?fields=formattedAddress,displayName.text,photos,websiteUri,userRatingCount,rating,id,nationalPhoneNumber,internationalPhoneNumber,shortFormattedAddress&languageCode=en&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
+          `https://places.googleapis.com/v1/places/${venue}?fields=formattedAddress,displayName.text,photos,websiteUri,userRatingCount,rating,id,nationalPhoneNumber,internationalPhoneNumber,shortFormattedAddress,location&languageCode=en&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
         ).then((r) => r.json()),
       );
     });
@@ -63,6 +62,8 @@ export async function POST(req: Request) {
       rating: venue.rating || 0,
       website: venue.websiteUri || "",
       ratingsCount: venue.userRatingCount || 0,
+      lat: venue.location.latitude,
+      lng: venue.location.longitude,
     }));
 
     await prisma.venue.createMany({ data }).catch(console.log);
@@ -75,4 +76,27 @@ export async function POST(req: Request) {
       message: "Failed",
     });
   }
+}
+
+export async function PATCH(req: Request) {
+  const { id, followers, following } = (await req.json()) as {
+    id: string;
+    followers: number;
+    following: string[];
+  };
+
+  await prisma.venue.update({
+    where: {
+      id: id,
+    },
+    data: {
+      followers: following.find((f) => f === id)
+        ? followers - 1
+        : followers + 1,
+    },
+  });
+
+  return Response.json({
+    message: "Successfully updated entry",
+  });
 }

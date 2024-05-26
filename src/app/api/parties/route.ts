@@ -20,3 +20,26 @@ export async function POST(req: Request) {
 
   return Response.json(parties);
 }
+
+export async function GET(req: Request) {
+  const venue = new URL(req.url).searchParams.get("venue");
+
+  const parties = await prisma.party.findMany({
+    where: {
+      Venue: {
+        slug: venue,
+      },
+    },
+    include: {
+      Venue: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  return Response.json({
+    parties,
+  });
+}

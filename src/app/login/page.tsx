@@ -4,7 +4,7 @@ import LoginForm from "@/components/LoginForm";
 
 export const metadata: Metadata = {
   title: "Login",
-  description: "Login to control your venues",
+  description: "Login to control your venues at Weekendr",
 };
 
 export default function Login() {
