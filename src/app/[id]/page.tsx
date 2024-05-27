@@ -54,22 +54,27 @@ export default function Profile() {
         <meta name="description" content={`${id} profile page`} />
       </Head>
       <main
-        className="max-w-7xl mx-auto px-5"
+        className="max-w-7xl mx-auto p-5 sm:text-current text-sm"
         style={{ minHeight: "calc(100dvh - 64px)" }}
       >
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3 justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <div className="w-24 h-24 rounded-full overflow-hidden">
-              <Image
-                src="/placeholder.png"
-                alt="Profile Picture"
-                className="w-full h-full object-cover"
-                width={150}
-                height={150}
-              />
+            <div className="flex flex-col text-center gap-3">
+              <div className="sm:w-24 w-20 sm:h-24 h-20 rounded-full overflow-hidden">
+                <Image
+                  src="/placeholder.png"
+                  alt="Profile Picture"
+                  className="w-full h-full object-cover"
+                  width={150}
+                  height={150}
+                />
+              </div>
+              <h2 className="sm:hidden">{venue.name}</h2>
             </div>
             <div>
-              <h2 className="text-2xl font-bold">{venue.name}</h2>
+              <h2 className="text-2xl sm:block hidden font-bold">
+                {venue.name}
+              </h2>
               <div className="flex items-center space-x-4 mt-2">
                 <span>
                   <strong>{venue.posts}</strong> posts
@@ -78,7 +83,7 @@ export default function Profile() {
                   <strong>{venue.followers}</strong> followers
                 </span>
               </div>
-              <div className="mt-4">
+              <div className="mt-4 flex">
                 <Button
                   onClick={async () => {
                     setFollowing((ids) =>
@@ -110,8 +115,6 @@ export default function Profile() {
                         return e;
                       }
                     });
-
-                    console.log({ message });
                   }}
                   className="rounded-lg"
                 >
@@ -125,11 +128,7 @@ export default function Profile() {
               </div>
             </div>
           </div>
-          <div>
-            <button className="px-4 py-2 border rounded-lg">
-              Edit Profile
-            </button>
-          </div>
+          <button className="px-4 py-2 border rounded-lg">Edit Profile</button>
         </div>
         <div className="mb-8">
           <p>{venue.about}</p>
