@@ -66,7 +66,7 @@ const Input: FC<Props> = ({
               color: value || focused ? "#5264ae" : "#999",
             }}
           >
-            {letter}
+            {letter === " " ? "\u00A0" : letter}
           </span>
         ))}
       </label>

@@ -29,34 +29,44 @@ const Parties = () => {
     }).then((res) => res.json()),
   );
 
-  if (!data) return <div>Loading...</div>;
+  if (!data)
+    return (
+      <main style={{ minHeight: "calc(100dvh - 64px)" }}>
+        <div>Loading...</div>
+      </main>
+    );
 
   return (
-    <ul>
-      {data.length ? (
-        data.map((venue) => (
-          <li className="bg-[#202e4b] p-5" key={venue.id}>
-            <Link href="#" className="flex gap-3 items-center">
-              <Image
-                src={venue.picture}
-                alt={venue.name}
-                width={100}
-                height={0}
-              />
-              <div className="flex flex-col">
-                <h2>{venue.name}</h2>
-                <p>{venue.tags}</p>
-                <p>{venue.genre}</p>
-                <p>{new Date(venue.date).toDateString()}</p>
-                <p>Venue: {venue.Venue.name}</p>
-              </div>
-            </Link>
-          </li>
-        ))
-      ) : (
-        <p>You aren&apos;t following any clubs/bars currently</p>
-      )}
-    </ul>
+    <main style={{ minHeight: "calc(100dvh - 64px)" }}>
+      <ul>
+        {data.length ? (
+          data.map((venue) => (
+            <li className="bg-[#202e4b] p-5" key={venue.id}>
+              <Link href="#" className="flex gap-3 items-center">
+                <Image
+                  src={venue.picture}
+                  alt={venue.name}
+                  width={100}
+                  height={0}
+                />
+                <div className="flex flex-col">
+                  <h2>{venue.name}</h2>
+                  <p>{venue.tags}</p>
+                  <p>{venue.genre}</p>
+                  <p>{new Date(venue.date).toDateString()}</p>
+                  <p>Venue: {venue.Venue.name}</p>
+                </div>
+              </Link>
+            </li>
+          ))
+        ) : (
+          <p>
+            You aren&apos;t following any clubs/bars currently OR there are no
+            future events planned.
+          </p>
+        )}
+      </ul>
+    </main>
   );
 };
 

@@ -52,7 +52,7 @@ model Venue {
   rating       Int
   website      String?
   ratingsCount Int
-  slug         String?
+  slug         String? @unique
   followers    Int     @default(0)
   posts        Int     @default(0)
   about        String?

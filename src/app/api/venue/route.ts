@@ -100,3 +100,17 @@ export async function PATCH(req: Request) {
     message: "Successfully updated entry",
   });
 }
+
+export async function GET(req: Request) {
+  const slug = new URL(req.url).searchParams.get("venue");
+
+  const venue = await prisma.venue.findFirst({
+    where: {
+      slug,
+    },
+  });
+
+  return Response.json({
+    venue,
+  });
+}

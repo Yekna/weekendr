@@ -4,7 +4,7 @@ import { FC, useState } from "react";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import Input from "./Input2";
-import Button from "./Button";
+import Button from "./Button2";
 import { useRouter } from "next/navigation";
 
 type Props = {};

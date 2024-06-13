@@ -1,6 +1,6 @@
 "use client";
 import { FC, useState } from "react";
-import Button from "./Button";
+import Button from "./Button2";
 import Select from "./Select2";
 import { useFormik } from "formik";
 import z from "zod";
@@ -21,8 +21,7 @@ const validationSchema = z.object({
     .array(z.string().min(27))
     .min(1, { message: "At least 1 venue needs to be selected" }),
   taxPictures: z.array(z.string().url()).min(1, {
-    message:
-      "At least 1 picture needs to be sent of your tax returns. Once you've chosen your picture(s) click on 'Upload n file(s)'",
+    message: "One or more files are bigger than allowed for their type",
   }),
 });
 
@@ -39,6 +38,7 @@ const Form: FC<Props> = () => {
     setFieldValue,
     handleBlur,
     touched,
+    setTouched,
   } = useFormik({
     initialValues: {
       username: "",
@@ -67,7 +67,10 @@ const Form: FC<Props> = () => {
         Stand Out From The Crowd. <br />
         Register your venue.
       </h1>
-      <form className="flex flex-col gap-5 sm:mb-0 mb-20" onSubmit={handleSubmit}>
+      <form
+        className="flex flex-col gap-5 sm:mb-0 mb-20"
+        onSubmit={handleSubmit}
+      >
         <Input
           touched={touched.username}
           onBlur={handleBlur}
@@ -100,8 +103,10 @@ const Form: FC<Props> = () => {
           setValues={setFieldValue}
         />
         <FileUpload
+          setTouched={setTouched}
           error={errors.taxPictures ? (errors.taxPictures as string) : ""}
           setFieldValue={setFieldValue}
+          touched={touched.taxPictures}
         />
         <Button
           disabled={isValidating || !isValid || isSubmitting || !dirty}

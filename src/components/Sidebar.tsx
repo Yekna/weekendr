@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FC, useMemo } from "react";
 import useSWR from "swr";
 import { useLocalStorage } from "usehooks-ts";
-import Button from "./Button";
+import Button from "./Button2";
 
 type Props = {
   isSmallScreen: boolean;
@@ -61,7 +61,7 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
 
   return (
     <aside
-      // try using state to set translateX(-100% | 0%)
+      // TODO: try using state to set translateX(-100% | 0%)
       style={{ ...changeAbsolutePosition }}
       className="bg-white overflow-scroll z-20 left-0 absolute transition-transform"
     >

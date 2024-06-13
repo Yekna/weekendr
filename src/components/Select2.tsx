@@ -5,6 +5,8 @@ import { FC, FocusEventHandler, useState } from "react";
 import useSWR from "swr";
 import { useDebounceValue } from "usehooks-ts";
 import { Spinner } from "./Spinner";
+import { Genre } from "@prisma/client";
+import Link from "next/link";
 
 type Props = {
   placeholder: string;
@@ -16,11 +18,21 @@ type Props = {
   ) =>
     | Promise<void>
     | Promise<
-        FormikErrors<{
-          username: string;
-          password: string;
-          venues: never[];
-        }>
+        FormikErrors<
+          | {
+              username: string;
+              password: string;
+              venues: never[];
+            }
+          | {
+              name: string;
+              tags: string[];
+              genre: Genre;
+              picture: string;
+              date: Date;
+              venueId: string;
+            }
+        >
       >;
   error?: string;
   disable?: boolean;
@@ -100,6 +112,17 @@ const Select: FC<Props> = ({
           ))}
         </label>
       </div>
+      <span>
+        Make sure your venue is registered as a club or a bar on{" "}
+        <Link
+          className="text-[#5264ae] underline"
+          target="_blank"
+          href="https://support.google.com/business/answer/7249669"
+        >
+          Google Maps
+        </Link>{" "}
+        in case you can&apos;t find it here.
+      </span>
       {isLoading && <Spinner />}
       {results &&
         results.candidates.map((result) => (

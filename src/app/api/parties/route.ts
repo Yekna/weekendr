@@ -8,6 +8,9 @@ export async function POST(req: Request) {
       venueId: {
         in: following,
       },
+      date: {
+        gte: new Date(),
+      },
     },
     include: {
       Venue: {
@@ -22,12 +25,12 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const venue = new URL(req.url).searchParams.get("venue");
+  const slug = new URL(req.url).searchParams.get("slug");
 
   const parties = await prisma.party.findMany({
     where: {
       Venue: {
-        slug: venue,
+        slug,
       },
     },
     include: {
@@ -37,6 +40,10 @@ export async function GET(req: Request) {
         },
       },
     },
+    orderBy: {
+      date: "desc",
+    },
+    take: 10,
   });
 
   return Response.json({

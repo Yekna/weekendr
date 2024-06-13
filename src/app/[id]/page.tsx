@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Button from "@/components/Button";
+import Button from "@/components/Button2";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Head from "next/head";
@@ -22,29 +22,27 @@ export default function Profile() {
   useEffect(() => {
     document.title = id;
 
-    const test = async () => {
-      fetch("/api/owner", {
-        method: "POST",
-        body: JSON.stringify({ owner: id }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+    const fetchVenue = async () => {
+      fetch(`/api/venue?venue=${id}`)
         .then((res) => res.json())
         .then(({ venue }) => setVenue(venue));
 
-      fetch(`/api/parties?venue=${id}`)
+      fetch(`/api/parties?slug=${id}`)
         .then((res) => res.json())
         .then(({ parties }) => setParties(parties));
     };
 
-    test();
+    fetchVenue();
   }, [id]);
 
   if (venue === null) {
-    return <main>Sorry that owner doesn&apos;t seem to exist</main>;
+    return (
+      <main style={{ minHeight: "calc(100dvh - 64px)" }}>
+        Sorry that venue doesn&apos;t seem to exist
+      </main>
+    );
   } else if (venue === undefined) {
-    return <main>loading...</main>;
+    return <main style={{ minHeight: "calc(100dvh - 64px)" }}>loading...</main>;
   }
 
   return (
@@ -83,7 +81,7 @@ export default function Profile() {
                   <strong>{venue.followers}</strong> followers
                 </span>
               </div>
-              <div className="mt-4 flex">
+              <div className="mt-4 flex gap-2 flex-wrap">
                 <Button
                   onClick={async () => {
                     setFollowing((ids) =>
@@ -94,7 +92,7 @@ export default function Profile() {
                         : [venue.id],
                     );
 
-                    const { message } = await fetch("/api/venue", {
+                    await fetch("/api/venue", {
                       method: "PATCH",
                       body: JSON.stringify({
                         id: venue.id,
@@ -122,19 +120,18 @@ export default function Profile() {
                     ? "Following"
                     : "Follow"}
                 </Button>
-                <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg ml-2">
-                  Message
-                </button>
+                <Button className="bg-gray-200 text-gray-700">
+                  <Link href={`/${id}/create`}>Create Party</Link>
+                </Button>
               </div>
             </div>
           </div>
-          <button className="px-4 py-2 border rounded-lg">Edit Profile</button>
         </div>
         <div className="mb-8">
           <p>{venue.about}</p>
         </div>
 
-        <ul>
+        <ul className="flex flex-col gap-3">
           {parties.length &&
             parties.map((party) => (
               <li className="bg-[#202e4b] p-5" key={party.id}>

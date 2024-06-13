@@ -8,7 +8,7 @@ const Header = () => {
         <Image
           priority={true}
           alt="Weekendr Logo"
-          src="logo.svg"
+          src="/logo.svg"
           width={50}
           height={50}
         />

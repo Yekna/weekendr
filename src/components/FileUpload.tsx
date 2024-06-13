@@ -1,7 +1,7 @@
 "use client";
 import { FC, useRef } from "react";
 import { UploadDropzone } from "@/utils/uploadthing";
-import { FormikErrors } from "formik";
+import { FormikErrors, FormikTouched } from "formik";
 
 type Props = {
   setFieldValue: (
@@ -20,9 +20,32 @@ type Props = {
       >;
   error?: string;
   touched?: boolean;
+  setTouched: (
+    touched: FormikTouched<{
+      username: string;
+      password: string;
+      venues: string[];
+      taxPictures: string[];
+    }>,
+    shouldValidate?: boolean | undefined,
+  ) =>
+    | Promise<
+        FormikErrors<{
+          username: string;
+          password: string;
+          venues: string[];
+          taxPictures: string[];
+        }>
+      >
+    | Promise<void>;
 };
 
-const FileUpload: FC<Props> = ({ setFieldValue, error, touched }) => {
+const FileUpload: FC<Props> = ({
+  setFieldValue,
+  error,
+  touched,
+  setTouched,
+}) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
   return (
@@ -40,6 +63,11 @@ const FileUpload: FC<Props> = ({ setFieldValue, error, touched }) => {
               "taxPictures",
               e.map(({ url }) => url),
             );
+          }}
+          onUploadError={() => {
+            setTouched({
+              taxPictures: true,
+            });
           }}
         />
       </div>

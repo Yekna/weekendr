@@ -1,6 +1,15 @@
-export const Spinner = () => {
+import { FC } from "react";
+
+type Props = {
+  className?: string;
+};
+
+export const Spinner: FC<Props> = ({ className }) => {
   return (
-    <div role="status" className="flex items-center justify-center">
+    <div
+      role="status"
+      className={`flex items-center justify-center absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 ${className}`}
+    >
       <svg
         aria-hidden="true"
         className="w-8 h-8 animate-spin text-gray-600 fill-gray-600"
