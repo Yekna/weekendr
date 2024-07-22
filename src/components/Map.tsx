@@ -1,6 +1,14 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  FC,
+} from "react";
 import ReactMapGl, {
   MapRef,
   Marker,
@@ -9,7 +17,6 @@ import ReactMapGl, {
 } from "react-map-gl";
 import { useLocalStorage, useMediaQuery } from "usehooks-ts";
 import "mapbox-gl/dist/mapbox-gl.css";
-import Sidebar from "./Sidebar";
 import useSWR from "swr";
 import { Party } from "@prisma/client";
 import Image from "next/image";
@@ -19,7 +26,12 @@ import Button from "./Button";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-const Map = () => {
+type Props = {
+  setId: Dispatch<SetStateAction<string>>;
+  id: string;
+};
+
+const Map: FC<Props> = ({ setId, id }) => {
   const mapRef = useRef<MapRef | null>(null);
   const [viewport, setViewport] = useLocalStorage<ViewState>("viewport", {
     latitude: 46.09167269144208,
@@ -38,7 +50,6 @@ const Map = () => {
 
   const [location, setLocation] = useState("");
   const [debouncedLocation] = useDebounceValue(location, 500);
-  const [id, setId] = useState<string>("");
   const [revalidate, setRevalidate] = useState(false);
   const [venues, setVenues] = useState<Array<{
     id: string;
@@ -81,11 +92,9 @@ const Map = () => {
     [setViewport],
   );
 
-  const { data } = useSWR<{ token: string }>("/api/token", fetcher);
-  const { data: venue } = useSWR(() => {
-    if (!id) return null;
-    return `/api/venues/${id}`;
-  }, fetcher);
+  const { data } = useSWR<{ token: string }>("/api/token", fetcher, {
+    revalidateOnFocus: false,
+  });
   const { data: fetchedLocationData } = useSWR<{
     results: Array<{
       formatted_address: string;
@@ -98,10 +107,14 @@ const Map = () => {
       };
       name: string;
     }>;
-  }>(() => {
-    if (!debouncedLocation) return null;
-    return `/api/location/?query=${debouncedLocation}`;
-  }, fetcher);
+  }>(
+    () => {
+      if (!debouncedLocation) return null;
+      return `/api/location/?query=${debouncedLocation}`;
+    },
+    fetcher,
+    { revalidateOnFocus: false },
+  );
 
   useEffect(() => {
     const refetchData = async () => {
@@ -143,7 +156,6 @@ const Map = () => {
       style={{ height: "calc(100dvh - 64px)" }}
       className="text-black overflow-hidden"
     >
-      <Sidebar venue={venue} isSmallScreen={isSmallScreen} />
       <ReactMapGl
         style={{ position: "relative" }}
         minZoom={15}

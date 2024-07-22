@@ -1,30 +1,32 @@
-"use client";
-
 import Image from "next/image";
 import { FC, useMemo } from "react";
-import useSWR from "swr";
-import { useLocalStorage } from "usehooks-ts";
+import { useLocalStorage, useMediaQuery } from "usehooks-ts";
 import Button from "./Button2";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
 
 type Props = {
-  isSmallScreen: boolean;
-  venue: {
-    id: string;
-    formattedAddress: string;
-    displayName: {
-      text: string;
-    };
-    shortFormattedAddress: string;
-    photos: Array<{ name: string }>;
-    rating: number;
-    websiteUri: string;
-    userRatingCount: number;
-    nationalPhoneNumber: string;
-    internationalPhoneNumber: string;
-  };
+  photos?: string[];
+  venue:
+    | {
+        id: string;
+        formattedAddress: string;
+        displayName: {
+          text: string;
+        };
+        shortFormattedAddress: string;
+        photos: Array<{ name: string }>;
+        rating: number;
+        websiteUri: string;
+        userRatingCount: number;
+        nationalPhoneNumber: string;
+        internationalPhoneNumber: string;
+      }
+    | undefined;
 };
 
-const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
+const Sidebar: FC<Props> = ({ venue, photos }) => {
+  const isSmallScreen = useMediaQuery("(max-width: 640px)");
   const [following, setFollowing] = useLocalStorage<string[]>("following", []);
   const changeAbsolutePosition = useMemo(() => {
     if (!isSmallScreen) {
@@ -41,14 +43,6 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
     };
   }, [isSmallScreen]);
 
-  const { data: photo } = useSWR(
-    () => {
-      if (!venue) return null;
-      return `/api/venues/photo/?NAME=${venue.photos[0].name}`;
-    },
-    (url: string) => fetch(url).then((res) => res.json()),
-  );
-
   // useEffect(() => {
   //   // setTimeout(() => {
   //   //   if (ref.current) {
@@ -62,17 +56,75 @@ const Sidebar: FC<Props> = ({ isSmallScreen, venue }) => {
   return (
     <aside
       // TODO: try using state to set translateX(-100% | 0%)
-      style={{ ...changeAbsolutePosition }}
-      className="bg-white overflow-scroll z-20 left-0 absolute transition-transform"
+      style={{
+        ...changeAbsolutePosition,
+      }}
+      className="bg-white overflow-scroll z-20 left-0 absolute transition-transform text-black"
     >
       <div className="flex flex-col-reverse sm:flex-col sm:p-0 p-5">
-        <Image
-          src={photo || "/placeholder.png"}
-          alt="Venue Thumbnail"
-          width={640}
-          height={320}
-          className="rounded-xl sm:rounded-none"
-        />
+        {photos?.length ? (
+          <Carousel
+            itemClass="slide"
+            additionalTransfrom={0}
+            arrows
+            centerMode={false}
+            draggable
+            focusOnSelect={false}
+            infinite
+            keyBoardControl
+            minimumTouchDrag={80}
+            renderArrowsWhenDisabled={false}
+            renderButtonGroupOutside={false}
+            renderDotsOutside={false}
+            responsive={{
+              desktop: {
+                breakpoint: {
+                  max: 3000,
+                  min: 1024,
+                },
+                items: 1,
+              },
+              mobile: {
+                breakpoint: {
+                  max: 464,
+                  min: 0,
+                },
+                items: 1,
+              },
+              tablet: {
+                breakpoint: {
+                  max: 1024,
+                  min: 464,
+                },
+                items: 1,
+              },
+            }}
+            rewind={false}
+            rewindWithAnimation={false}
+            rtl={false}
+            shouldResetAutoplay
+            slidesToSlide={1}
+            swipeable
+          >
+            {photos.map((photo, i) => (
+              <Image
+                key={photo + i}
+                src={photo}
+                alt="Venue Thumbnail"
+                width={640}
+                height={320}
+                className="rounded-xl sm:rounded-none w-full h-full object-cover"
+              />
+            ))}
+          </Carousel>
+        ) : (
+          <Image
+            alt="placeholder image"
+            src="/placeholder.png"
+            width={640}
+            height={320}
+          />
+        )}
         <div className="sm:p-5 pb-5 flex flex-col">
           <h1 className="text-2xl">{venue.displayName.text}</h1>
           <div className="flex gap-3 mt-2">
