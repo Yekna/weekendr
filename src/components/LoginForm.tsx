@@ -5,7 +5,7 @@ import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import Input from "./Input2";
 import Button from "./Button2";
-import { useRouter } from "next/navigation";
+import { login } from "@/actions";
 
 type Props = {};
 
@@ -19,8 +19,6 @@ const validationSchema = z.object({
 });
 
 const Form: FC<Props> = ({}) => {
-  const router = useRouter();
-  const [message, setMessage] = useState("");
   const {
     handleSubmit,
     touched,
@@ -38,22 +36,7 @@ const Form: FC<Props> = ({}) => {
       password: "",
     },
     onSubmit: async ({ username, password }) => {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const { message, success } = await res.json();
-      if (success) {
-        router.push("/");
-      } else {
-        setMessage(message);
-      }
+      login({ username, password });
     },
     validationSchema: toFormikValidationSchema(validationSchema),
   });
@@ -90,7 +73,6 @@ const Form: FC<Props> = ({}) => {
         >
           Login
         </Button>
-        <p className="uppercase">{message}</p>
       </form>
     </div>
   );

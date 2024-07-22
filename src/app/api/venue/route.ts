@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import prisma from "../../../../prisma/client";
 
 // TODO: use zod for schema validation for form data and venuesData
