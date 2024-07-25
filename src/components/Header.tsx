@@ -10,9 +10,9 @@ const Header = async () => {
         <Image
           priority={true}
           alt="Weekendr Logo"
-          src="/logo.svg"
-          width={50}
-          height={50}
+          src="/logo.png"
+          width={120}
+          height={48}
         />
       </Link>
       <nav>
