@@ -92,9 +92,7 @@ const Map: FC<Props> = ({ setId, id }) => {
     [setViewport],
   );
 
-  const { data } = useSWR<{ token: string }>("/api/token", fetcher, {
-    revalidateOnFocus: false,
-  });
+  const { data } = useSWR<{ token: string }>("/api/token", fetcher);
   const { data: fetchedLocationData } = useSWR<{
     results: Array<{
       formatted_address: string;
@@ -107,14 +105,10 @@ const Map: FC<Props> = ({ setId, id }) => {
       };
       name: string;
     }>;
-  }>(
-    () => {
-      if (!debouncedLocation) return null;
-      return `/api/location/?query=${debouncedLocation}`;
-    },
-    fetcher,
-    { revalidateOnFocus: false },
-  );
+  }>(() => {
+    if (!debouncedLocation) return null;
+    return `/api/location/?query=${debouncedLocation}`;
+  }, fetcher);
 
   useEffect(() => {
     const refetchData = async () => {
@@ -203,7 +197,7 @@ const Map: FC<Props> = ({ setId, id }) => {
           style={{
             top: isSmallScreen ? "0" : "2.5rem",
             left: isSmallScreen ? "0" : "2.5rem",
-            width: isSmallScreen ? "100%" : "326px",
+            width: isSmallScreen ? "100%" : "328px",
           }}
         >
           <Input
@@ -229,7 +223,7 @@ const Map: FC<Props> = ({ setId, id }) => {
                     )
                   }
                 >
-                  {data.formatted_address}
+                  {`${data.name} (${data.formatted_address})`}
                 </Button>
               ))}
           </div>

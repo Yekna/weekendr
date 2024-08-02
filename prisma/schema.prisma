@@ -17,6 +17,14 @@ enum Genre {
   ROCK
   METAL
   HIPHOP
+  EDM
+  POP
+  FOLK
+  REGGAE
+  TECHNO
+  HOUSE
+  TRAP
+  RANDB
 }
 
 model Party {
@@ -32,12 +40,11 @@ model Party {
 
 model Owner {
   id          Int      @id @default(autoincrement())
-  username    String
+  username    String   @unique
   password    String
   taxPictures String[]
   venues      Venue[]
   verified    Boolean  @default(false)
-  slug        String?
 }
 
 model Venue {
@@ -52,7 +59,7 @@ model Venue {
   rating       Int
   website      String?
   ratingsCount Int
-  slug         String? @unique
+  slug         String  @unique
   followers    Int     @default(0)
   posts        Int     @default(0)
   about        String?

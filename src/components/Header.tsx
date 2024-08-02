@@ -23,7 +23,7 @@ const Header = async () => {
                 <Link href="/profile">{session.user?.name}</Link>
               </li>
               <li>
-                <Link href="api/auth/signout">Logout</Link>
+                <Link href="/api/auth/signout">Logout</Link>
               </li>
             </>
           ) : (

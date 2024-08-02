@@ -52,6 +52,7 @@ export async function POST(req: Request) {
 
     const photos = await Promise.all(photosPromises);
 
+    // TODO: maybe names and slugs can't be unique because there are venues with same names all over the world
     const data = venuesData.map((venue, i) => ({
       address: venue.formattedAddress,
       id: venue.id,
@@ -64,6 +65,7 @@ export async function POST(req: Request) {
       ratingsCount: venue.userRatingCount || 0,
       lat: venue.location.latitude,
       lng: venue.location.longitude,
+      slug: venue.displayName.text.toLowerCase().replace(/\s+/g, "-"),
     }));
 
     await prisma.venue.createMany({ data }).catch(console.log);
@@ -103,6 +105,12 @@ export async function PATCH(req: Request) {
 
 export async function GET(req: Request) {
   const slug = new URL(req.url).searchParams.get("venue");
+
+  if (!slug) {
+    return Response.json({
+      venue: undefined,
+    });
+  }
 
   const venue = await prisma.venue.findFirst({
     where: {

@@ -3,36 +3,37 @@ import { FC, useMemo } from "react";
 import { useLocalStorage, useMediaQuery } from "usehooks-ts";
 import Button from "./Button2";
 import Carousel from "react-multi-carousel";
+import { Party } from "@prisma/client";
 import "react-multi-carousel/lib/styles.css";
+import Parties from "./Parties2";
 
 type Props = {
   photos?: string[];
-  venue:
-    | {
-        id: string;
-        formattedAddress: string;
-        displayName: {
-          text: string;
-        };
-        shortFormattedAddress: string;
-        photos: Array<{ name: string }>;
-        rating: number;
-        websiteUri: string;
-        userRatingCount: number;
-        nationalPhoneNumber: string;
-        internationalPhoneNumber: string;
-      }
-    | undefined;
+  venue?: {
+    id: string;
+    formattedAddress: string;
+    displayName: {
+      text: string;
+    };
+    shortFormattedAddress: string;
+    photos: Array<{ name: string }>;
+    rating: number;
+    websiteUri: string;
+    userRatingCount: number;
+    nationalPhoneNumber: string;
+    internationalPhoneNumber: string;
+  };
+  parties?: Array<Party & { Venue: { name: string } }>;
 };
 
-const Sidebar: FC<Props> = ({ venue, photos }) => {
+const Sidebar: FC<Props> = ({ venue, photos, parties = [] }) => {
   const isSmallScreen = useMediaQuery("(max-width: 640px)");
-  const [following, setFollowing] = useLocalStorage<string[]>("following", []);
+  const [ids, setIds] = useLocalStorage<string[]>("following", []);
   const changeAbsolutePosition = useMemo(() => {
     if (!isSmallScreen) {
       return {
         top: "64px",
-        right: "calc(100dvw - 406px)",
+        right: "calc(100dvw - 408px)",
         bottom: 0,
       };
     }
@@ -111,8 +112,8 @@ const Sidebar: FC<Props> = ({ venue, photos }) => {
                 key={photo + i}
                 src={photo}
                 alt="Venue Thumbnail"
-                width={640}
-                height={320}
+                width={408}
+                height={256}
                 className="rounded-xl sm:rounded-none w-full h-full object-cover"
               />
             ))}
@@ -121,8 +122,8 @@ const Sidebar: FC<Props> = ({ venue, photos }) => {
           <Image
             alt="placeholder image"
             src="/placeholder.png"
-            width={640}
-            height={320}
+            width={408}
+            height={256}
           />
         )}
         <div className="sm:p-5 pb-5 flex flex-col">
@@ -179,18 +180,28 @@ const Sidebar: FC<Props> = ({ venue, photos }) => {
           <Button
             className="mt-3"
             onClick={() =>
-              setFollowing((ids) =>
+              setIds((ids) =>
                 ids.length
-                  ? following.find((f) => f === venue.id)
-                    ? following.filter((f) => f !== venue.id)
+                  ? ids.find((f) => f === venue.id)
+                    ? ids.filter((f) => f !== venue.id)
                     : [...ids, venue.id]
                   : [venue.id],
               )
             }
           >
-            {following.find((f) => f === venue.id) ? "Following" : "Follow"}
+            {ids.find((f) => f === venue.id) ? "Following" : "Follow"}
           </Button>
         </div>
+      </div>
+      <div className="p-5 pt-0">
+        {parties.length ? (
+          <>
+            <h3>Future events:</h3>
+            <Parties parties={parties} noPartiesPlaceholder="" />
+          </>
+        ) : (
+          <div></div>
+        )}
       </div>
     </aside>
   );

@@ -7,6 +7,7 @@ import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "./api/uploadthing/core";
 import { NextUIProvider } from "@nextui-org/react";
 import { SessionProvider } from "next-auth/react";
+import PayPalProvider from "@/providers/PaypalProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,9 +26,13 @@ export default function RootLayout({
       <body className={inter.className}>
         <SessionProvider>
           <NextUIProvider>
-            <Header />
-            <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
-            {children}
+            <PayPalProvider>
+              <Header />
+              <NextSSRPlugin
+                routerConfig={extractRouterConfig(ourFileRouter)}
+              />
+              {children}
+            </PayPalProvider>
           </NextUIProvider>
         </SessionProvider>
       </body>

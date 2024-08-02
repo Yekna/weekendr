@@ -1,15 +1,17 @@
 import prisma from "../../../../prisma/client";
 
 export async function POST(req: Request) {
-  const { owner } = await req.json();
+  const { username } = await req.json();
 
-  const venue = await prisma.venue.findFirst({
+  const venues = await prisma.venue.findMany({
     where: {
-      slug: owner,
+      owner: {
+        username,
+      },
     },
   });
 
   return Response.json({
-    venue,
+    venues,
   });
 }

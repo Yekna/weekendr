@@ -13,6 +13,8 @@ import { useState } from "react";
 import useSWR from "swr";
 import { Spinner } from "@/components/Spinner";
 import Button from "@/components/Button2";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -27,6 +29,14 @@ const validationSchema = z.object({
 });
 
 export default function CreateParty() {
+  const { status } = useSession();
+  const router = useRouter();
+
+  // TODO: implement middleware instead
+  if (status === "unauthenticated") {
+    router.push("/");
+  }
+
   const [message, setMessage] = useState("");
   const { id } = useParams<{ id: string }>();
   const { data } = useSWR<{ venue: Venue }>(`/api/venue?venue=${id}`, fetcher);
@@ -38,7 +48,6 @@ export default function CreateParty() {
     errors,
     values,
     handleChange,
-    isValidating,
     setFieldValue,
     isValid,
     dirty,
@@ -77,7 +86,10 @@ export default function CreateParty() {
       className="max-w-7xl grid sm:grid-cols-2 place-items-center mx-auto gap-5 px-5"
       style={{ minHeight: "calc(100dvh - 64px)" }}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-3 w-full overflow-x-hidden"
+      >
         <Input
           touched={touched.name}
           onBlur={handleBlur}
@@ -95,7 +107,7 @@ export default function CreateParty() {
           name="tags"
           value={values.tags}
           onChange={handleChange}
-          placeholder="Tags (Separate by comma, optional)"
+          placeholder="Tags (Optional, Separate by comma)"
         />
         <input
           name="date"
@@ -110,7 +122,7 @@ export default function CreateParty() {
         )}
         <div>
           <h2>Genre:</h2>
-          <section className="radio-inputs overflow-scroll">
+          <section className="radio-inputs">
             {Object.keys(Genre).map((genre) => (
               <RadioButton
                 genre={genre}

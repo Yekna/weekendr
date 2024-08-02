@@ -1,13 +1,18 @@
 "use client";
 import Map from "@/components/Map";
 import Sidebar from "@/components/Sidebar";
-import { useState } from "react";
+import { Party } from "@prisma/client";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
   const [id, setId] = useState<string>("");
+  const [parties, setParties] = useState<
+    Array<Party & { Venue: { name: string } }>
+  >([]);
+
   const { data: venue } = useSWR<{
     id: string;
     formattedAddress: string;
@@ -27,18 +32,32 @@ export default function Home() {
     if (!id) return null;
     return `/api/venues/${id}`;
   }, fetcher);
+
   const { data: photos } = useSWR<Array<string>>(
     () => {
       if (!venue) return null;
       return `/api/venues/photo/?NAME=${venue.photos.map(({ name }) => name).toString()}`;
     },
     (url: string) => fetch(url).then((res) => res.json()),
-    { revalidateOnFocus: false },
   );
+
+  useEffect(() => {
+    if (id) {
+      const fetchData = async () => {
+        const parties = await fetch("/api/parties", {
+          method: "POST",
+          body: JSON.stringify({ ids: [id] }),
+          headers: { "Content-Type": "application/json" },
+        }).then((res) => res.json());
+        return parties;
+      };
+      fetchData().then(setParties);
+    }
+  }, [id]);
 
   return (
     <main>
-      <Sidebar photos={photos} venue={venue} />
+      <Sidebar parties={parties} photos={photos} venue={venue} />
       <Map id={id} setId={setId} />
     </main>
   );
