@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FC, useMemo } from "react";
+import { Dispatch, FC, SetStateAction, useMemo } from "react";
 import { useLocalStorage, useMediaQuery } from "usehooks-ts";
 import Button from "./Button2";
 import Carousel from "react-multi-carousel";
@@ -24,9 +24,10 @@ type Props = {
     internationalPhoneNumber: string;
   };
   parties?: Array<Party & { Venue: { name: string } }>;
+  setId: Dispatch<SetStateAction<string>>;
 };
 
-const Sidebar: FC<Props> = ({ venue, photos, parties = [] }) => {
+const Sidebar: FC<Props> = ({ venue, photos, parties = [], setId }) => {
   const isSmallScreen = useMediaQuery("(max-width: 640px)");
   const [ids, setIds] = useLocalStorage<string[]>("following", []);
   const changeAbsolutePosition = useMemo(() => {
@@ -60,9 +61,15 @@ const Sidebar: FC<Props> = ({ venue, photos, parties = [] }) => {
       style={{
         ...changeAbsolutePosition,
       }}
-      className="bg-white overflow-scroll z-20 left-0 absolute transition-transform text-black"
+      className="step-3 step-2 bg-white overflow-scroll z-20 left-0 absolute transition-transform text-black"
     >
-      <div className="flex flex-col-reverse sm:flex-col sm:p-0 p-5">
+      <button
+        className="step-6 z-30 absolute right-0 hover:bg-gray-700 rounded-bl-lg top-0 bg-gray-800 text-white font-bold focus:outline-none py-1 px-3"
+        onClick={() => setId("")}
+      >
+        X
+      </button>
+      <div className="relative flex flex-col-reverse sm:flex-col sm:p-0 p-5">
         {photos?.length ? (
           <Carousel
             itemClass="slide"
@@ -178,7 +185,7 @@ const Sidebar: FC<Props> = ({ venue, photos, parties = [] }) => {
             </a>
           )}
           <Button
-            className="mt-3"
+            className="mt-3 step-4"
             onClick={() =>
               setIds((ids) =>
                 ids.length
@@ -194,14 +201,8 @@ const Sidebar: FC<Props> = ({ venue, photos, parties = [] }) => {
         </div>
       </div>
       <div className="p-5 pt-0">
-        {parties.length ? (
-          <>
-            <h3>Future events:</h3>
-            <Parties parties={parties} noPartiesPlaceholder="" />
-          </>
-        ) : (
-          <div></div>
-        )}
+        <h3>Future events:</h3>
+        <Parties parties={parties} noPartiesPlaceholder="No events planned yet." />
       </div>
     </aside>
   );

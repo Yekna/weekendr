@@ -8,6 +8,7 @@ import { ourFileRouter } from "./api/uploadthing/core";
 import { NextUIProvider } from "@nextui-org/react";
 import { SessionProvider } from "next-auth/react";
 import PayPalProvider from "@/providers/PaypalProvider";
+import "shepherd.js/dist/css/shepherd.css";
 
 const inter = Inter({ subsets: ["latin"] });
 

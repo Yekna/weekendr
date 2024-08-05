@@ -23,6 +23,7 @@ import Image from "next/image";
 import Input from "./Input";
 import { useDebounceValue } from "usehooks-ts";
 import Button from "./Button";
+import Shepherd from "shepherd.js";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -32,7 +33,9 @@ type Props = {
 };
 
 const Map: FC<Props> = ({ setId, id }) => {
+  const venueRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapRef | null>(null);
+  const [showTutorial, setShowTutorial] = useLocalStorage("showTutorial", true);
   const [viewport, setViewport] = useLocalStorage<ViewState>("viewport", {
     latitude: 46.09167269144208,
     longitude: 19.66244234405549,
@@ -109,6 +112,120 @@ const Map: FC<Props> = ({ setId, id }) => {
     if (!debouncedLocation) return null;
     return `/api/location/?query=${debouncedLocation}`;
   }, fetcher);
+
+  useEffect(() => {
+    // TODO: find out a way to get venues if the person using this application doesn't have any near him
+    if (venues && showTutorial) {
+      const tour = new Shepherd.Tour({
+        useModalOverlay: true,
+        defaultStepOptions: {
+          scrollTo: true,
+        },
+      });
+
+      tour.addStep({
+        id: "step-1",
+        text: "These little icons represent your local venues. Clicking on one will show more info",
+        attachTo: {
+          element: ".step-1",
+          on: "bottom",
+        },
+        buttons: [
+          {
+            text: "Next",
+            action: () => {
+              venueRef.current?.click();
+              tour.next();
+            },
+          },
+        ],
+      });
+
+      tour.addStep({
+        id: "step-2",
+        text: "This is called the sidebar",
+        attachTo: {
+          element: ".step-2",
+          on: "bottom",
+        },
+        buttons: [
+          {
+            text: "Next",
+            action: tour.next,
+          },
+        ],
+      });
+
+      tour.addStep({
+        id: "step-3",
+        text: "It's used to show you all the info you need regarding the venue you clicked on",
+        attachTo: {
+          element: ".step-3",
+          on: isSmallScreen ? "top-start" : "right-end",
+        },
+        buttons: [
+          {
+            text: "Next",
+            action: tour.next,
+          },
+        ],
+      });
+
+      tour.addStep({
+        id: "step-4",
+        text: "Clicking this button will follow this particular venue",
+        attachTo: {
+          element: ".step-4",
+          on: "bottom",
+        },
+        buttons: [
+          {
+            text: "Next",
+            action: tour.next,
+          },
+        ],
+      });
+
+      tour.addStep({
+        id: "step-5",
+        text: "This is where you will find all future events for the venue you clicked on",
+        attachTo: {
+          element: ".step-5",
+          on: "top",
+        },
+        buttons: [
+          {
+            text: "Next",
+            action: tour.next,
+          },
+        ],
+      });
+
+      tour.addStep({
+        id: "step-6",
+        text: "Finally click on this button to close the sidebar",
+        attachTo: {
+          element: ".step-6",
+          on: "bottom",
+        },
+        buttons: [
+          {
+            text: "Complete",
+            action: tour.complete,
+          },
+        ],
+      });
+
+      tour.on("complete", () => {
+        setShowTutorial(false);
+      });
+      tour.on("cancel", () => {
+        console.log("canceled");
+      });
+
+      tour.start();
+    }
+  }, [venues, showTutorial, setShowTutorial, isSmallScreen]);
 
   useEffect(() => {
     const refetchData = async () => {
@@ -229,38 +346,74 @@ const Map: FC<Props> = ({ setId, id }) => {
           </div>
         </div>
         {venues ? (
-          venues.map((venue) => (
-            <Marker
-              key={venue.id}
-              onClick={() => setId(venue.id)}
-              latitude={venue.location.latitude}
-              longitude={venue.location.longitude}
-            >
-              <div
-                className="flex items-center hover:cursor-pointer transition-transform text-white"
-                style={{
-                  transform: id === venue.id ? "scale(1.2)" : "scale(1)",
-                }}
+          venues.map((venue, index) =>
+            index ? (
+              <Marker
+                key={venue.id}
+                onClick={() => setId(venue.id)}
+                latitude={venue.location.latitude}
+                longitude={venue.location.longitude}
               >
-                {parties.some(({ venueId }) => venueId === venue.id) ? (
-                  <Image
-                    src={url(venue.id)}
-                    alt="Genre"
-                    width={50}
-                    height={50}
-                  />
-                ) : (
-                  <Image
-                    src={`/${venue.primaryType}.svg`}
-                    alt={venue.primaryType}
-                    width={35}
-                    height={35}
-                  />
-                )}
-                <span>{venue.displayName.text}</span>
-              </div>
-            </Marker>
-          ))
+                <div
+                  className="flex items-center hover:cursor-pointer transition-transform text-white"
+                  style={{
+                    transform: id === venue.id ? "scale(1.2)" : "scale(1)",
+                  }}
+                >
+                  {parties.some(({ venueId }) => venueId === venue.id) ? (
+                    <Image
+                      src={url(venue.id)}
+                      alt="Genre"
+                      width={50}
+                      height={50}
+                    />
+                  ) : (
+                    <Image
+                      src={`/${venue.primaryType}.svg`}
+                      alt={venue.primaryType}
+                      width={35}
+                      height={35}
+                    />
+                  )}
+                  <span>{venue.displayName.text}</span>
+                </div>
+              </Marker>
+            ) : (
+              <Marker
+                key={venue.id}
+                onClick={() => setId(venue.id)}
+                latitude={venue.location.latitude}
+                longitude={venue.location.longitude}
+              >
+                <div
+                  ref={venueRef}
+                  className="flex items-center hover:cursor-pointer transition-transform text-white"
+                  style={{
+                    transform: id === venue.id ? "scale(1.2)" : "scale(1)",
+                  }}
+                >
+                  {parties.some(({ venueId }) => venueId === venue.id) ? (
+                    <Image
+                      className="step-1"
+                      src={url(venue.id)}
+                      alt="Genre"
+                      width={50}
+                      height={50}
+                    />
+                  ) : (
+                    <Image
+                      className="step-1"
+                      src={`/${venue.primaryType}.svg`}
+                      alt={venue.primaryType}
+                      width={35}
+                      height={35}
+                    />
+                  )}
+                  <span>{venue.displayName.text}</span>
+                </div>
+              </Marker>
+            ),
+          )
         ) : (
           <div className="absolute -translate-x-1/2 left-1/2 -translate-y-1/2 top-1/2 text-white font-extrabold">
             Loading........

@@ -57,7 +57,7 @@ export default function Home() {
 
   return (
     <main>
-      <Sidebar parties={parties} photos={photos} venue={venue} />
+      <Sidebar parties={parties} photos={photos} venue={venue} setId={setId} />
       <Map id={id} setId={setId} />
     </main>
   );
