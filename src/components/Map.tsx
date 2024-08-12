@@ -75,11 +75,11 @@ const Map: FC<Props> = ({ setId, id }) => {
         if (parties[i].venueId === id) {
           switch (parties[i].genre) {
             case "ROCK":
-              return "/rock.png";
+              return "/rock.svg";
             case "METAL":
-              return "/metal.png";
+              return "/metal.svg";
             case "HIPHOP":
-              return "/hiphop.png";
+              return "/hiphop.svg";
             case "REGGAE":
               return "/reggae.svg";
             case "RANDB":
