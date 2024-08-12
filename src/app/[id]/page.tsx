@@ -19,7 +19,7 @@ export default function Profile() {
   const session = useSession();
   const { id } = useParams<{ id: string }>();
   const [venue, setVenue] = useState<Venue | undefined>();
-  const [parties, setParties] = useState<ExtendedParty[]>([]);
+  const [parties, setParties] = useState<ExtendedParty[] | undefined>();
   const [following, setFollowing] = useLocalStorage<string[]>("following", []);
 
   useEffect(() => {
@@ -112,7 +112,9 @@ export default function Profile() {
                 {following.find((f) => f === venue.id) ? "Following" : "Follow"}
               </Button>
               <Button className="bg-gray-200 text-gray-700">
-                <Link href={`/${id}/create`}>Create Party</Link>
+                <Link target="_blank" href={`/${id}/create`}>
+                  Create Party
+                </Link>
               </Button>
             </div>
           </div>

@@ -6,6 +6,7 @@ import Carousel from "react-multi-carousel";
 import { Party } from "@prisma/client";
 import "react-multi-carousel/lib/styles.css";
 import Parties from "./Parties2";
+import Link from "next/link";
 
 type Props = {
   photos?: string[];
@@ -27,7 +28,7 @@ type Props = {
   setId: Dispatch<SetStateAction<string>>;
 };
 
-const Sidebar: FC<Props> = ({ venue, photos, parties = [], setId }) => {
+const Sidebar: FC<Props> = ({ venue, photos, parties, setId }) => {
   const isSmallScreen = useMediaQuery("(max-width: 640px)");
   const [ids, setIds] = useLocalStorage<string[]>("following", []);
   const changeAbsolutePosition = useMemo(() => {
@@ -72,6 +73,7 @@ const Sidebar: FC<Props> = ({ venue, photos, parties = [], setId }) => {
       <div className="relative flex flex-col-reverse sm:flex-col sm:p-0 p-5">
         {photos?.length ? (
           <Carousel
+            containerClass="slider"
             itemClass="slide"
             additionalTransfrom={0}
             arrows
@@ -139,11 +141,21 @@ const Sidebar: FC<Props> = ({ venue, photos, parties = [], setId }) => {
             {venue.rating && venue.userRatingCount ? (
               <>
                 <span>{venue.rating}</span>
-                <span>
+                <span className="flex items-center">
                   {Array.from({
                     length: Math.round(venue.rating),
                   }).map((_, i) => (
-                    <span key={i}>*</span>
+                    <svg
+                      key={i}
+                      fill="#1f2937"
+                      stroke-width="0"
+                      viewBox="0 0 576 512"
+                      height="1em"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"></path>
+                    </svg>
                   ))}
                 </span>
                 <span>{`(${venue.userRatingCount})`}</span>
@@ -202,7 +214,10 @@ const Sidebar: FC<Props> = ({ venue, photos, parties = [], setId }) => {
       </div>
       <div className="p-5 pt-0">
         <h3>Future events:</h3>
-        <Parties parties={parties} noPartiesPlaceholder="No events planned yet." />
+        <Parties
+          parties={parties}
+          noPartiesPlaceholder="No events planned yet."
+        />
       </div>
     </aside>
   );

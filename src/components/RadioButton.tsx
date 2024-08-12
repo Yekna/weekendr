@@ -1,5 +1,4 @@
 import { Genre } from "@prisma/client";
-import Image from "next/image";
 import { ChangeEvent, FC } from "react";
 
 type Props = {

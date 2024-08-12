@@ -33,7 +33,7 @@ const Input: FC<Props> = ({
         value={value}
         placeholder={placeholder}
         name={name}
-        className="border border-gray-300 p-2 rounded-md text-black disabled:cursor-not-allowed outline-none"
+        className="border border-gray-300 p-2 rounded-md text-black disabled:cursor-not-allowed outline-none shadow-2xl"
         type={type}
         onChange={onChange}
       />

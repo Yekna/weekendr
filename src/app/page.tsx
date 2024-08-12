@@ -10,8 +10,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function Home() {
   const [id, setId] = useState<string>("");
   const [parties, setParties] = useState<
-    Array<Party & { Venue: { name: string } }>
-  >([]);
+    Array<Party & { Venue: { name: string } }> | undefined
+  >();
 
   const { data: venue } = useSWR<{
     id: string;

@@ -80,6 +80,22 @@ const Map: FC<Props> = ({ setId, id }) => {
               return "/metal.png";
             case "HIPHOP":
               return "/hiphop.png";
+            case "REGGAE":
+              return "/reggae.svg";
+            case "RANDB":
+              return "/randb.svg";
+            case "EDM":
+              return "/edm.svg";
+            case "POP":
+              return "/pop.svg";
+            case "FOLK":
+              return "/folk.svg";
+            case "TRAP":
+              return "/trap.svg";
+            case "HOUSE":
+              return "/house.svg";
+            case "TECHNO":
+              return "/techno.svg";
           }
         }
       }
@@ -144,10 +160,6 @@ const Map: FC<Props> = ({ setId, id }) => {
       tour.addStep({
         id: "step-2",
         text: "This is called the sidebar",
-        attachTo: {
-          element: ".step-2",
-          on: "bottom",
-        },
         buttons: [
           {
             text: "Next",
@@ -203,6 +215,21 @@ const Map: FC<Props> = ({ setId, id }) => {
 
       tour.addStep({
         id: "step-6",
+        text: "Clicking on this will change the image",
+        attachTo: {
+          element: ".slider button:nth-child(3)",
+          on: "top",
+        },
+        buttons: [
+          {
+            text: "Next",
+            action: tour.next,
+          },
+        ],
+      });
+
+      tour.addStep({
+        id: "step-7",
         text: "Finally click on this button to close the sidebar",
         attachTo: {
           element: ".step-6",
