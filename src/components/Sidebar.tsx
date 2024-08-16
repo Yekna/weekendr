@@ -6,7 +6,6 @@ import Carousel from "react-multi-carousel";
 import { Party } from "@prisma/client";
 import "react-multi-carousel/lib/styles.css";
 import Parties from "./Parties2";
-import Link from "next/link";
 
 type Props = {
   photos?: string[];
@@ -148,7 +147,7 @@ const Sidebar: FC<Props> = ({ venue, photos, parties, setId }) => {
                     <svg
                       key={i}
                       fill="#1f2937"
-                      stroke-width="0"
+                      strokeWidth="0"
                       viewBox="0 0 576 512"
                       height="1em"
                       width="1em"

@@ -8,7 +8,7 @@ import { Party, Venue } from "@prisma/client";
 import { useLocalStorage } from "usehooks-ts";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import Parties from "@/components/Parties2";
+import Parties from "@/components/Parties3";
 
 type ExtendedParty = Party & {
   Venue: Venue;
