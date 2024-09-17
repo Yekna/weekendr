@@ -121,7 +121,7 @@ export default function CreateParty() {
           <p className="text-red-500 italic">{errors.date}</p>
         )}
         <div>
-          <h2>Genre:</h2>
+          <label>Genre:</label>
           <section className="radio-inputs">
             {Object.keys(Genre).map((genre) => (
               <RadioButton
@@ -133,40 +133,38 @@ export default function CreateParty() {
             ))}
           </section>
         </div>
-        <UploadButton
-          className="items-start"
-          endpoint="imageUploader"
-          onClientUploadComplete={(e) => {
-            setTouched({ picture: true });
-            setFieldValue("picture", e[0].url);
-          }}
-          content={{
-            button() {
-              return "Choose party banner";
-            },
-          }}
-          appearance={{
-            button: "w-auto px-4",
-          }}
-          config={{ mode: "auto" }}
-          onUploadError={() => {
-            setTouched({ picture: true });
-            setFieldError(
-              "picture",
-              "One or more files are bigger than allowed for their type",
-            );
-          }}
-        />
-        {errors.picture && touched.picture && (
-          <p className="text-red-500 italic">
-            Max Image Size is 4MB. Please choose a different image.
-          </p>
-        )}
-        {!errors.picture && touched.picture && (
-          <p className="text-[#5264ae] italic">
-            Successfully Uploaded Image :)
-          </p>
-        )}
+        <div>
+          <span>Choose party banner</span>
+          <UploadButton
+            className="uploadthing"
+            endpoint="imageUploader"
+            onClientUploadComplete={(e) => {
+              setTouched({ picture: true });
+              setFieldValue("picture", e[0].url);
+            }}
+            appearance={{
+              button: "w-auto px-4",
+            }}
+            config={{ mode: "auto" }}
+            onUploadError={() => {
+              setTouched({ picture: true });
+              setFieldError(
+                "picture",
+                "One or more files are bigger than allowed for their type",
+              );
+            }}
+          />
+          {errors.picture && touched.picture && (
+            <p className="text-red-500 italic">
+              Max Image Size is 4MB. Please choose a different image.
+            </p>
+          )}
+          {!errors.picture && touched.picture && (
+            <p className="text-[#5264ae] italic">
+              Successfully Uploaded Image :)
+            </p>
+          )}
+        </div>
         <input
           type="text"
           className="hidden"

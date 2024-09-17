@@ -3,12 +3,13 @@
 import Image from "next/image";
 import Button from "@/components/Button2";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Party, Venue } from "@prisma/client";
 import { useLocalStorage } from "usehooks-ts";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import Parties from "@/components/Parties3";
+import useSWR, { mutate } from "swr";
 
 type ExtendedParty = Party & {
   Venue: Venue;
@@ -18,22 +19,34 @@ export default function Profile() {
   // TODO: compare the session username with the owner of the current venue being viewed
   const session = useSession();
   const { id } = useParams<{ id: string }>();
-  const [venue, setVenue] = useState<Venue | undefined>();
-  const [parties, setParties] = useState<ExtendedParty[] | undefined>();
   const [following, setFollowing] = useLocalStorage<string[]>("following", []);
 
-  useEffect(() => {
-    fetch(`/api/venue?venue=${id}`)
-      .then((res) => res.json())
-      .then(({ venue }) => {
-        document.title = venue.name;
-        setVenue(venue);
-      });
+  const { data: venue } = useSWR<Venue | undefined>(
+    () => {
+      if (!id) return undefined;
+      return `/api/venue?venue=${id}`;
+    },
+    (url: string) =>
+      fetch(url)
+        .then((res) => res.json())
+        .then(({ venue }) => {
+          console.log({ venue });
+          document.title = venue.name;
+          return venue;
+        }),
+  );
 
-    fetch(`/api/parties?slug=${id}`)
-      .then((res) => res.json())
-      .then(({ parties }) => setParties(parties));
-  }, [id]);
+  const { data: parties } = useSWR<ExtendedParty[] | undefined>(
+    () => {
+      if (!id) return undefined;
+      return `/api/parties?slug=${id}`;
+    },
+    (url: string) =>
+      fetch(url)
+        .then((res) => res.json())
+        .then(({ parties }) => parties),
+  );
+  console.log({ following });
 
   if (venue === null) {
     return (
@@ -55,9 +68,9 @@ export default function Profile() {
           <div className="flex flex-col text-center gap-3">
             <div className="sm:w-24 w-20 sm:h-24 h-20 rounded-full overflow-hidden">
               <Image
-                src="/placeholder.png"
+                src={venue.picture || "/placeholder.png"}
                 alt="Profile Picture"
-                className="w-full h-full object-cover"
+                className="w-full h-full flex items-center object-cover"
                 width={150}
                 height={150}
               />
@@ -68,7 +81,7 @@ export default function Profile() {
             <h2 className="text-2xl sm:block hidden font-bold">{venue.name}</h2>
             <div className="flex items-center space-x-4 mt-2">
               <span>
-                <strong>{venue.posts}</strong> posts
+                <strong>{parties?.length}</strong> posts
               </span>
               <span>
                 <strong>{venue.followers}</strong> followers
@@ -85,37 +98,43 @@ export default function Profile() {
                       : [venue.id],
                   );
 
-                  await fetch("/api/venue", {
+                  mutate(
+                    `/api/venue?venue=${id}`,
+                    {
+                      followers: "|",
+                      name: venue.name,
+                      picture: venue.picture,
+                      posts: parties?.length,
+                      about: venue.about,
+                    },
+                    false,
+                  );
+
+                  const res = await fetch("/api/venue", {
                     method: "PATCH",
                     body: JSON.stringify({
                       id: venue.id,
                       followers: venue.followers,
                       following,
                     }),
-                  }).then((res) => res.json());
-
-                  setVenue((venue) => {
-                    if (venue) {
-                      return {
-                        ...venue,
-                        followers: following.find((f) => f === venue.id)
-                          ? venue.followers - 1
-                          : venue.followers + 1,
-                      };
-                    } else {
-                      return venue;
-                    }
                   });
+
+                  if (res.ok) {
+                    console.log("uraaaa");
+                    mutate(`/api/venue?venue=${id}`);
+                  } else {
+                    console.log("kurcina");
+                  }
                 }}
                 className="rounded-lg"
               >
                 {following.find((f) => f === venue.id) ? "Following" : "Follow"}
               </Button>
-              <Button className="bg-gray-200 text-gray-700">
-                <Link target="_blank" href={`/${id}/create`}>
+              <Link target="_blank" href={`/${id}/create`}>
+                <Button className="bg-gray-200 text-gray-700">
                   Create Party
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

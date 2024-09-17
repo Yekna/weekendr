@@ -473,3 +473,7 @@ input:focus ~ .bar:after {
 iframe:focus-visible {
   outline: none !important;
 }
+
+.uploadthing {
+  align-items: stretch;
+}

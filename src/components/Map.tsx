@@ -69,6 +69,20 @@ const Map: FC<Props> = ({ setId, id }) => {
     }>
   >([]);
 
+  // TODO: Figure out a better way to loop over venues
+  const genre = useCallback(
+    (id: string, primaryType: "night_club" | "bar") => {
+      for (let i = 0; i < parties.length; i++) {
+        if (parties[i].venueId === id) {
+          return parties[i].genre;
+        }
+        return primaryType;
+      }
+      return primaryType;
+    },
+    [parties],
+  );
+
   const url = useCallback(
     (id: string) => {
       for (let i = 0; i < parties.length; i++) {
@@ -382,6 +396,7 @@ const Map: FC<Props> = ({ setId, id }) => {
                 longitude={venue.location.longitude}
               >
                 <div
+                  title={genre(venue.id, venue.primaryType)}
                   className="flex items-center hover:cursor-pointer transition-transform text-white"
                   style={{
                     transform: id === venue.id ? "scale(1.2)" : "scale(1)",
@@ -413,6 +428,7 @@ const Map: FC<Props> = ({ setId, id }) => {
                 longitude={venue.location.longitude}
               >
                 <div
+                  title={genre(venue.id, venue.primaryType)}
                   ref={venueRef}
                   className="flex items-center hover:cursor-pointer transition-transform text-white"
                   style={{
