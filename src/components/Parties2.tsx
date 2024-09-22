@@ -25,7 +25,7 @@ const Parties: FC<Props> = ({ parties, noPartiesPlaceholder }) => {
           <li className="bg-[#202e4b] p-5" key={venue.id}>
             <Link href="#" className="flex gap-3 items-center">
               <Image
-                src={venue.picture}
+                src={venue.media[0]}
                 alt={venue.name}
                 width={100}
                 height={0}
