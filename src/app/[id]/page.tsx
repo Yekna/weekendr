@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Button from "@/components/Button2";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
 import { Party, Venue } from "@prisma/client";
 import { useLocalStorage } from "usehooks-ts";
 import Link from "next/link";
@@ -19,34 +18,33 @@ export default function Profile() {
   // TODO: compare the session username with the owner of the current venue being viewed
   const session = useSession();
   const { id } = useParams<{ id: string }>();
+  console.log({ id });
   const [following, setFollowing] = useLocalStorage<string[]>("following", []);
 
   const { data: venue } = useSWR<Venue | undefined>(
-    () => {
-      if (!id) return undefined;
-      return `/api/venue?venue=${id}`;
-    },
+    `/api/venue?venue=${id}`,
     (url: string) =>
       fetch(url)
-        .then((res) => res.json())
+        .then((res) => {
+          console.log({ url });
+          return res.json();
+        })
         .then(({ venue }) => {
-          console.log({ venue });
           document.title = venue.name;
           return venue;
         }),
   );
 
   const { data: parties } = useSWR<ExtendedParty[] | undefined>(
-    () => {
-      if (!id) return undefined;
-      return `/api/parties?slug=${id}`;
-    },
+    `/api/parties?slug=${id}`,
     (url: string) =>
       fetch(url)
-        .then((res) => res.json())
+        .then((res) => {
+          console.log({ id });
+          return res.json();
+        })
         .then(({ parties }) => parties),
   );
-  console.log({ following });
 
   if (venue === null) {
     return (

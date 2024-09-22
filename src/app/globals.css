@@ -477,3 +477,7 @@ iframe:focus-visible {
 .uploadthing {
   align-items: stretch;
 }
+
+.shepherd-button {
+  background: #3288e6 !important;
+}

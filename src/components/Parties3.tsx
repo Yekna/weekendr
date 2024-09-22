@@ -12,11 +12,7 @@ type Props = {
 
 const Parties: FC<Props> = ({ parties, noPartiesPlaceholder }) => {
   if (!parties)
-    return (
-      <main style={{ minHeight: "calc(100dvh - 64px)" }}>
-        <div>Loading...</div>
-      </main>
-    );
+    return <div style={{ minHeight: "calc(100dvh - 64px)" }}>Loading...</div>;
 
   return (
     <ul
@@ -26,10 +22,17 @@ const Parties: FC<Props> = ({ parties, noPartiesPlaceholder }) => {
       {parties.length ? (
         parties.map((venue) => (
           <li key={venue.id} className="relative h-64">
-            <Link href="#" target="_blank">
+            <Link
+              onClick={(e) => {
+                e.preventDefault();
+                history.pushState(null, "", `/p/${venue.id}`);
+              }}
+              href=""
+              target="_blank"
+            >
               <Image
                 className="rounded-lg h-full w-full object-cover"
-                src={venue.picture}
+                src={venue.media[0]}
                 alt={venue.name}
                 width={400}
                 height={400}
