@@ -23,7 +23,7 @@ import Image from "next/image";
 import Input from "./Input";
 import { useDebounceValue } from "usehooks-ts";
 import Button from "./Button";
-import Shepherd from "shepherd.js";
+import { Config, driver } from "driver.js";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -144,127 +144,97 @@ const Map: FC<Props> = ({ setId, id }) => {
   }, fetcher);
 
   useEffect(() => {
-    // TODO: find out a way to get venues if the person using this application doesn't have any near him
-    if (venues && showTutorial) {
-      const tour = new Shepherd.Tour({
-        useModalOverlay: true,
-        defaultStepOptions: {
-          scrollTo: true,
-        },
-      });
-
-      tour.addStep({
-        id: "step-1",
-        text: "These little icons represent your local venues. Clicking on one will show more info",
-        attachTo: {
-          element: ".step-1",
-          on: "bottom",
-        },
-        buttons: [
+    if (showTutorial && venues?.length) {
+      const options: Config = {
+        showProgress: true,
+        steps: [
           {
-            text: "Next",
-            action: () => {
-              venueRef.current?.click();
-              tour.next();
+            element: ".step-1",
+            popover: {
+              side: "bottom",
+              title: "Venue Icons",
+              description:
+                "These little icons represent your local venues. Clicking on one will show more info.",
+              onNextClick: () => {
+                venueRef.current?.click();
+                tour.moveNext();
+              },
+            },
+          },
+          {
+            element: ".step-2",
+            popover: {
+              title: "Venue Sidebar",
+              description:
+                "The venue siderbar is used to show you all the info you need regarding the venue you clicked on.",
+              side: isSmallScreen ? "over" : "right",
+            },
+          },
+          {
+            element: ".step-3",
+            popover: {
+              title: "Follow Button",
+              description:
+                "Clicking on this button will follow this venue and the parties they host.",
+            },
+          },
+          {
+            element: ".step-4",
+            popover: {
+              title: "Parties List",
+              description: "This is where you will find all future events for the venue you clicked on.",
+              side: 'top'
+            },
+          },
+          {
+            element: '.slider button:nth-child(3)',
+            popover: {
+              title: 'Image Slider',
+              description: 'Clicking on this will change the image.',
+              side: 'top'
+            }
+          },
+          {
+            element: '.step-5',
+            popover: {
+              title: 'Close sidebar button',
+              description: 'Finally you can click on this button to close the sidebar.',
+              side: 'bottom'
+            }
+          }
+        ],
+        onDestroyed: () => {
+          setShowTutorial(false);
+        },
+      };
+      const tour = driver(options);
+      tour.drive();
+    } else if (showTutorial && venues?.length === 0) {
+      const options: Config = {
+        steps: [
+          {
+            popover: {
+              title: "No Venues Found In Your Location",
+              description:
+                "We're sorry but it seems like no venues are registered where you live. Try and move around.",
+            },
+          },
+          {
+            // TODO: implement a tour button
+            element: ".show-tour-btn",
+            popover: {
+              title: "Show Tour Button",
+              description:
+                "If you feel lost after finding a venue and need a tour feel free to click on this little button :)",
             },
           },
         ],
-      });
-
-      tour.addStep({
-        id: "step-2",
-        text: "This is called the sidebar",
-        buttons: [
-          {
-            text: "Next",
-            action: tour.next,
-          },
-        ],
-      });
-
-      tour.addStep({
-        id: "step-3",
-        text: "It's used to show you all the info you need regarding the venue you clicked on",
-        attachTo: {
-          element: ".step-3",
-          on: isSmallScreen ? "top-start" : "right-end",
+        onDestroyed: () => {
+          setShowTutorial(false);
         },
-        buttons: [
-          {
-            text: "Next",
-            action: tour.next,
-          },
-        ],
-      });
-
-      tour.addStep({
-        id: "step-4",
-        text: "Clicking this button will follow this particular venue",
-        attachTo: {
-          element: ".step-4",
-          on: "bottom",
-        },
-        buttons: [
-          {
-            text: "Next",
-            action: tour.next,
-          },
-        ],
-      });
-
-      tour.addStep({
-        id: "step-5",
-        text: "This is where you will find all future events for the venue you clicked on",
-        attachTo: {
-          element: ".step-5",
-          on: "top",
-        },
-        buttons: [
-          {
-            text: "Next",
-            action: tour.next,
-          },
-        ],
-      });
-
-      tour.addStep({
-        id: "step-6",
-        text: "Clicking on this will change the image",
-        attachTo: {
-          element: ".slider button:nth-child(3)",
-          on: "top",
-        },
-        buttons: [
-          {
-            text: "Next",
-            action: tour.next,
-          },
-        ],
-      });
-
-      tour.addStep({
-        id: "step-7",
-        text: "Finally click on this button to close the sidebar",
-        attachTo: {
-          element: ".step-6",
-          on: "bottom",
-        },
-        buttons: [
-          {
-            text: "Complete",
-            action: tour.complete,
-          },
-        ],
-      });
-
-      tour.on("complete", () => {
-        setShowTutorial(false);
-      });
-      tour.on("cancel", () => {
-        console.log("canceled");
-      });
-
-      tour.start();
+      };
+      const tour = driver(options);
+      tour.drive();
     }
   }, [venues, showTutorial, setShowTutorial, isSmallScreen]);
 

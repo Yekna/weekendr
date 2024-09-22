@@ -478,6 +478,6 @@ iframe:focus-visible {
   align-items: stretch;
 }
 
-.shepherd-button {
-  background: #3288e6 !important;
+.driver-popover-close-btn {
+  outline: none;
 }

@@ -19,7 +19,7 @@ const Parties: FC<Props> = ({ parties, noPartiesPlaceholder }) => {
     );
 
   return (
-    <ul className="step-5 flex flex-col gap-3">
+    <ul className="step-4 flex flex-col gap-3">
       {parties.length ? (
         parties.map((venue) => (
           <li className="bg-[#202e4b] p-5" key={venue.id}>

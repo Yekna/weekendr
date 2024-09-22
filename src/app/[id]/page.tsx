@@ -18,17 +18,13 @@ export default function Profile() {
   // TODO: compare the session username with the owner of the current venue being viewed
   const session = useSession();
   const { id } = useParams<{ id: string }>();
-  console.log({ id });
   const [following, setFollowing] = useLocalStorage<string[]>("following", []);
 
   const { data: venue } = useSWR<Venue | undefined>(
     `/api/venue?venue=${id}`,
     (url: string) =>
       fetch(url)
-        .then((res) => {
-          console.log({ url });
-          return res.json();
-        })
+        .then((res) => res.json())
         .then(({ venue }) => {
           document.title = venue.name;
           return venue;
@@ -39,10 +35,7 @@ export default function Profile() {
     `/api/parties?slug=${id}`,
     (url: string) =>
       fetch(url)
-        .then((res) => {
-          console.log({ id });
-          return res.json();
-        })
+        .then((res) => res.json())
         .then(({ parties }) => parties),
   );
 

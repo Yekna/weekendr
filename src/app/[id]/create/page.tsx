@@ -24,7 +24,7 @@ const validationSchema = z.object({
   }),
   tags: z.string().optional(),
   genre: z.nativeEnum(Genre),
-  picture: z.string().url(),
+  media: z.string().url().array(),
   date: z.string({ required_error: "Please choose a date for the party" }),
 });
 
@@ -58,14 +58,14 @@ export default function CreateParty() {
       name: "",
       tags: "",
       genre: Object.keys(Genre)[0],
-      picture: "",
+      media: [] as string[],
       date: "",
       venueId: id,
     },
-    onSubmit: async ({ name, tags, genre, picture, date, venueId }) => {
+    onSubmit: async ({ name, tags, genre, media, date, venueId }) => {
       const { message } = await fetch("/api/party", {
         method: "POST",
-        body: JSON.stringify({ name, tags, genre, picture, date, venueId }),
+        body: JSON.stringify({ name, tags, genre, media, date, venueId }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -139,27 +139,30 @@ export default function CreateParty() {
             className="uploadthing"
             endpoint="imageUploader"
             onClientUploadComplete={(e) => {
-              setTouched({ picture: true });
-              setFieldValue("picture", e[0].url);
+              setTouched({ media: true });
+              setFieldValue(
+                "media",
+                e.length > 1 ? e.map(({ url }) => url) : [e[0].url],
+              );
             }}
             appearance={{
               button: "w-auto px-4",
             }}
             config={{ mode: "auto" }}
-            onUploadError={() => {
-              setTouched({ picture: true });
+            onUploadError={(e) => {
+              setTouched({ media: true });
               setFieldError(
-                "picture",
-                "One or more files are bigger than allowed for their type",
+                "media",
+                e.toString(),
               );
             }}
           />
-          {errors.picture && touched.picture && (
+          {errors.media && touched.media && (
             <p className="text-red-500 italic">
               Max Image Size is 4MB. Please choose a different image.
             </p>
           )}
-          {!errors.picture && touched.picture && (
+          {!errors.media && touched.media && (
             <p className="text-[#5264ae] italic">
               Successfully Uploaded Image :)
             </p>

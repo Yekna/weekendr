@@ -28,7 +28,7 @@ type Props = {
               name: string;
               tags: string[];
               genre: Genre;
-              picture: string;
+              media: string;
               date: Date;
               venueId: string;
             }
