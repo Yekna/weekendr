@@ -32,7 +32,7 @@ model Party {
   name    String
   tags    String?
   genre   Genre
-  picture String
+  media   String[]
   date    DateTime
   Venue   Venue    @relation(fields: [venueId], references: [id])
   venueId String
