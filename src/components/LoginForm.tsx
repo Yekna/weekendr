@@ -19,6 +19,7 @@ const validationSchema = z.object({
 });
 
 const Form: FC<Props> = ({}) => {
+  const [message, setMessage] = useState("");
   const {
     handleSubmit,
     touched,
@@ -36,7 +37,11 @@ const Form: FC<Props> = ({}) => {
       password: "",
     },
     onSubmit: async ({ username, password }) => {
-      login({ username, password });
+      try {
+        await login({ username, password });
+      } catch (e) {
+        setMessage("Invalid Credentials");
+      }
     },
     validationSchema: toFormikValidationSchema(validationSchema),
   });
@@ -73,6 +78,7 @@ const Form: FC<Props> = ({}) => {
         >
           Login
         </Button>
+        <p className="text-red-500 italic">{message}</p>
       </form>
     </div>
   );

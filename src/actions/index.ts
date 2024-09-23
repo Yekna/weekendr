@@ -8,13 +8,10 @@ export const login = async ({
   username: string;
   password: string;
 }) => {
-  // TODO: add try and catch clauses
+  // TODO: implement rate limiting to prevent brute-force attacks
   await signIn("credentials", {
     username,
     password,
-    // redirect: true,
     redirectTo: "/",
   });
-
-  return { success: "Logged in!" };
 };
