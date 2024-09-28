@@ -26,7 +26,7 @@ export default function Profile() {
       fetch(url)
         .then((res) => res.json())
         .then(({ venue }) => {
-          document.title = venue.name;
+          document.title = venue ? venue.name : "Not Found";
           return venue;
         }),
   );
@@ -42,7 +42,7 @@ export default function Profile() {
   if (venue === null) {
     return (
       <main style={{ minHeight: "calc(100dvh - 64px)" }}>
-        Sorry that venue doesn&apos;t seem to exist
+        Sorry that venue isn&apos;t registered on Weekendr yet
       </main>
     );
   } else if (venue === undefined) {

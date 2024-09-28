@@ -182,26 +182,28 @@ const Map: FC<Props> = ({ setId, id }) => {
             element: ".step-4",
             popover: {
               title: "Parties List",
-              description: "This is where you will find all future events for the venue you clicked on.",
-              side: 'top'
+              description:
+                "This is where you will find all future events for the venue you clicked on.",
+              side: "top",
             },
           },
           {
-            element: '.slider button:nth-child(3)',
+            element: ".slider button:nth-child(3)",
             popover: {
-              title: 'Image Slider',
-              description: 'Clicking on this will change the image.',
-              side: 'top'
-            }
+              title: "Image Slider",
+              description: "Clicking on this will change the image.",
+              side: "top",
+            },
           },
           {
-            element: '.step-5',
+            element: ".step-5",
             popover: {
-              title: 'Close sidebar button',
-              description: 'Finally you can click on this button to close the sidebar.',
-              side: 'bottom'
-            }
-          }
+              title: "Close sidebar button",
+              description:
+                "Finally you can click on this button to close the sidebar.",
+              side: "bottom",
+            },
+          },
         ],
         onDestroyed: () => {
           setShowTutorial(false);
