@@ -186,20 +186,27 @@ const Sidebar: FC<Props> = ({ venue, photos = [], parties, setId }) => {
               {venue?.internationalPhoneNumber}
             </a>
           )}
-          <Button
-            className="mt-3 step-3"
-            onClick={() =>
-              setIds((ids) =>
-                ids.length
-                  ? ids.find((f) => f === venue?.id)
-                    ? ids.filter((f) => f !== venue?.id)
-                    : [...ids, venue?.id || ""]
-                  : [venue?.id || ""],
-              )
-            }
-          >
-            {ids.find((f) => f === venue?.id) ? "Following" : "Follow"}
-          </Button>
+          <div className="flex gap-2 mt-3">
+            <Button
+              className="step-3"
+              onClick={() =>
+                setIds((ids) =>
+                  ids.length
+                    ? ids.find((f) => f === venue?.id)
+                      ? ids.filter((f) => f !== venue?.id)
+                      : [...ids, venue?.id || ""]
+                    : [venue?.id || ""],
+                )
+              }
+            >
+              {ids.find((f) => f === venue?.id) ? "Following" : "Follow"}
+            </Button>
+            <Button
+              href={`/${venue?.displayName.text.toLowerCase().replace(/\s+/g, "-")}`}
+            >
+              Profile
+            </Button>
+          </div>
         </div>
       </div>
       <div className="p-5 pt-0">
