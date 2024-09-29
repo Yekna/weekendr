@@ -37,8 +37,8 @@ const Map: FC<Props> = ({ setId, id }) => {
   const mapRef = useRef<MapRef | null>(null);
   const [showTutorial, setShowTutorial] = useLocalStorage("showTutorial", true);
   const [viewport, setViewport] = useLocalStorage<ViewState>("viewport", {
-    latitude: 46.09167269144208,
-    longitude: 19.66244234405549,
+    latitude: 0,
+    longitude: 0,
     zoom: 10,
     bearing: 0,
     pitch: 30,
@@ -264,6 +264,21 @@ const Map: FC<Props> = ({ setId, id }) => {
     refetchData();
   }, [revalidate]);
 
+  // TODO: figure out a better way to check if the user has visited the site for the first time
+  useEffect(() => {
+    if (!viewport.longitude && !viewport.latitude) {
+      fetch("https://ipapi.co/json/")
+        .then((res) => res.json())
+        .then((data) =>
+          setViewport((v) => ({
+            ...v,
+            latitude: data.latitude,
+            longitude: data.longitude,
+          })),
+        );
+    }
+  }, [viewport.latitude, viewport.longitude, setViewport]);
+
   const changeViewport = useCallback(
     async (latitude: number, longitude: number) => {
       setViewport((v) => ({ ...v, latitude, longitude }));
@@ -273,7 +288,7 @@ const Map: FC<Props> = ({ setId, id }) => {
     [setViewport],
   );
 
-  if (!data) return;
+  if (!data || (!viewport.longitude && !viewport.latitude)) return;
 
   return (
     <div
