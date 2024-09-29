@@ -481,3 +481,17 @@ iframe:focus-visible {
 .driver-popover-close-btn {
   outline: none;
 }
+
+.sidebar {
+  right: 0;
+  top: "50%";
+  bottom: "calc(64px)";
+}
+
+@media (min-width: 640px) {
+  .sidebar {
+    top: "64px";
+    right: "calc(100dvw - 408px)";
+    bottom: 0;
+  }
+}

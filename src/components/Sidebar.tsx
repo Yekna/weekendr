@@ -33,16 +33,10 @@ const Sidebar: FC<Props> = ({ venue, photos = [], parties, setId }) => {
   const changeAbsolutePosition = useMemo(() => {
     if (!isSmallScreen) {
       return {
-        top: "64px",
-        right: "calc(100dvw - 408px)",
-        bottom: 0,
         transform: venue ? "translateX(0)" : "translateX(-100%)",
       };
     }
     return {
-      right: 0,
-      top: "50%",
-      bottom: "calc(64px)",
       transform: venue ? "translateY(0)" : "translateY(100%)",
     };
   }, [isSmallScreen, venue]);
@@ -52,7 +46,7 @@ const Sidebar: FC<Props> = ({ venue, photos = [], parties, setId }) => {
       style={{
         ...changeAbsolutePosition,
       }}
-      className="step-2 bg-white overflow-scroll z-20 left-0 absolute transition-transform text-black"
+      className="step-2 bg-white overflow-scroll z-20 left-0 absolute transition-transform text-black sidebar"
     >
       <button
         className="step-5 z-30 absolute right-0 hover:bg-gray-700 rounded-bl-lg top-0 bg-gray-800 text-white font-bold focus:outline-none py-1 px-3"
