@@ -211,33 +211,7 @@ const Map: FC<Props> = ({ setId, id }) => {
       };
       const tour = driver(options);
       tour.drive();
-    } else if (showTutorial && venues?.length === 0) {
-      const options: Config = {
-        steps: [
-          {
-            popover: {
-              title: "No Venues Found In Your Location",
-              description:
-                "We're sorry but it seems like no venues are registered where you live. Try and move around.",
-            },
-          },
-          {
-            // TODO: implement a tour button
-            element: ".show-tour-btn",
-            popover: {
-              title: "Show Tour Button",
-              description:
-                "If you feel lost after finding a venue and need a tour feel free to click on this little button :)",
-            },
-          },
-        ],
-        onDestroyed: () => {
-          setShowTutorial(false);
-        },
-      };
-      const tour = driver(options);
-      tour.drive();
-    }
+    } 
   }, [venues, showTutorial, setShowTutorial, isSmallScreen]);
 
   useEffect(() => {
