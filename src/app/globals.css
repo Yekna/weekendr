@@ -483,15 +483,15 @@ iframe:focus-visible {
 }
 
 .sidebar {
-  right: 0;
-  top: "50%";
-  bottom: "calc(64px)";
+  top: 64px;
+  right: calc(100dvw - 408px);
+  bottom: 0;
 }
 
-@media (min-width: 640px) {
+@media (max-width: 640px) {
   .sidebar {
-    top: "64px";
-    right: "calc(100dvw - 408px)";
-    bottom: 0;
+    right: 0;
+    top: 50%;
+    bottom: 64px;
   }
 }
