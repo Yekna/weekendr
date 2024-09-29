@@ -202,6 +202,7 @@ const Sidebar: FC<Props> = ({ venue, photos = [], parties, setId }) => {
               {ids.find((f) => f === venue?.id) ? "Following" : "Follow"}
             </Button>
             <Button
+              className="bg-gray-200 text-gray-700"
               href={`/${venue?.displayName.text.toLowerCase().replace(/\s+/g, "-")}`}
             >
               Profile
