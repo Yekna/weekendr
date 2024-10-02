@@ -15,6 +15,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Weekendr",
   description: "Find clubs and bars near you",
+  metadataBase: new URL(process.env.WEBSITE_URL as string)
 };
 
 export default function RootLayout({
