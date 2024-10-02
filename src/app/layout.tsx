@@ -15,9 +15,6 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Weekendr",
   description: "Find clubs and bars near you",
-  other: {
-    "og:image": `${process.env.WEBSITE_URL}/5da269df3e90dc74d9eec6ea742968d4ca0ba88e_s2_n2_y2.png`,
-  },
 };
 
 export default function RootLayout({
