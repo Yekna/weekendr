@@ -13,9 +13,14 @@ import "driver.js/dist/driver.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  openGraph: {
+    url: process.env.WEBSITE_URL,
+    siteName: "Weekendr",
+    type: "website",
+  },
   title: "Weekendr",
   description: "Find clubs and bars near you",
-  metadataBase: new URL(process.env.WEBSITE_URL as string)
+  metadataBase: new URL(process.env.WEBSITE_URL as string),
 };
 
 export default function RootLayout({
