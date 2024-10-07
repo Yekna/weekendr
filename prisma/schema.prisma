@@ -28,14 +28,15 @@ enum Genre {
 }
 
 model Party {
-  id      String   @id @default(cuid())
-  name    String
-  tags    String?
-  genre   Genre
-  media   String[]
-  date    DateTime
-  Venue   Venue    @relation(fields: [venueId], references: [id])
-  venueId String
+  id          String   @id @default(cuid())
+  name        String
+  tags        String?
+  genre       Genre
+  media       String[]
+  date        DateTime
+  Venue       Venue    @relation(fields: [venueId], references: [id])
+  venueId     String
+  dateCreated DateTime @default(now())
 }
 
 model Owner {
