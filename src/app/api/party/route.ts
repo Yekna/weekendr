@@ -3,8 +3,6 @@ import prisma from "../../../../prisma/client";
 export async function POST(req: Request) {
   const { name, tags, genre, media, date, venueId } = await req.json();
 
-  console.log({ media });
-
   const newTags = tags.replace(",", ", ");
 
   const newDate = new Date(date);
@@ -27,6 +25,7 @@ export async function POST(req: Request) {
       media,
       tags: newTags,
       venueId: venue.id,
+      dateCreated: new Date(),
     },
   });
 

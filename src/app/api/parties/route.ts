@@ -1,7 +1,25 @@
 import prisma from "../../../../prisma/client";
 
 export async function POST(req: Request) {
-  const { ids }: { ids: string[] } = await req.json();
+  const {
+    ids,
+    filterBy = "Week",
+  }: { ids: string[]; filterBy: "Week" | "Month" | "Year" } = await req.json();
+
+  let lte = new Date(),
+    gte = new Date();
+
+  switch (filterBy) {
+    case "Week":
+      lte.setDate(lte.getDate() + 7);
+      break;
+    case "Month":
+      lte.setMonth(lte.getMonth() + 1);
+      break;
+    case "Year":
+      lte.setFullYear(lte.getFullYear() + 1);
+      break;
+  }
 
   const parties = await prisma.party.findMany({
     where: {
@@ -9,7 +27,8 @@ export async function POST(req: Request) {
         in: ids,
       },
       date: {
-        gte: new Date(),
+        gte,
+        lte,
       },
     },
     include: {
@@ -47,7 +66,7 @@ export async function GET(req: Request) {
       },
     },
     orderBy: {
-      date: "desc",
+      dateCreated: 'desc',
     },
     take: 10,
   });
