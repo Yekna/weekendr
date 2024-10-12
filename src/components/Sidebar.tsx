@@ -25,28 +25,36 @@ type Props = {
   };
   parties?: Array<Party & { Venue: { name: string } }>;
   setId: Dispatch<SetStateAction<string>>;
+  registeredVenue?: { venue: { followers: number } | undefined };
 };
 
-const Sidebar: FC<Props> = ({ venue, photos = [], parties, setId }) => {
+const Sidebar: FC<Props> = ({
+  venue,
+  photos = [],
+  parties,
+  setId,
+  registeredVenue,
+}) => {
   const isSmallScreen = useMediaQuery("(max-width: 640px)");
   const [ids, setIds] = useLocalStorage<string[]>("following", []);
+
   const changeAbsolutePosition = useMemo(() => {
     if (!isSmallScreen) {
       return {
         transform: venue ? "translateX(0)" : "translateX(-100%)",
+        transition: venue ? "transform 150ms cubic-bezier(0.4, 0, 0.2, 1)" : "",
       };
     }
     return {
       transform: venue ? "translateY(0)" : "translateY(100%)",
+      transition: venue ? "transform 150ms cubic-bezier(0.4, 0, 0.2, 1)" : "",
     };
   }, [isSmallScreen, venue]);
 
   return (
     <aside
-      style={{
-        ...changeAbsolutePosition,
-      }}
-      className="step-2 bg-white overflow-scroll z-20 left-0 absolute transition-transform text-black sidebar"
+      style={changeAbsolutePosition}
+      className="step-2 bg-white overflow-scroll z-20 left-0 absolute text-black sidebar"
     >
       <button
         className="step-5 z-30 absolute right-0 hover:bg-gray-700 rounded-bl-lg top-0 bg-gray-800 text-white font-bold focus:outline-none py-1 px-3"
@@ -55,7 +63,7 @@ const Sidebar: FC<Props> = ({ venue, photos = [], parties, setId }) => {
         X
       </button>
       <div className="relative flex flex-col-reverse sm:flex-col sm:p-0 p-5">
-        {photos?.length ? (
+        {photos.length ? (
           <Carousel
             containerClass="slider"
             itemClass="slide"
@@ -183,15 +191,30 @@ const Sidebar: FC<Props> = ({ venue, photos = [], parties, setId }) => {
           <div className="flex gap-2 mt-3">
             <Button
               className="step-3"
-              onClick={() =>
+              onClick={async () => {
                 setIds((ids) =>
                   ids.length
                     ? ids.find((f) => f === venue?.id)
                       ? ids.filter((f) => f !== venue?.id)
                       : [...ids, venue?.id || ""]
                     : [venue?.id || ""],
-                )
-              }
+                );
+
+                const res = await fetch("/api/venue", {
+                  method: "PATCH",
+                  body: JSON.stringify({
+                    id: venue?.id,
+                    followers: registeredVenue?.venue?.followers,
+                    following: ids,
+                  }),
+                });
+
+                if (res.ok) {
+                  console.log("ura");
+                } else {
+                  console.log("uva");
+                }
+              }}
             >
               {ids.find((f) => f === venue?.id) ? "Following" : "Follow"}
             </Button>

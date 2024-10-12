@@ -33,6 +33,13 @@ export default function Home() {
     return `/api/venues/${id}`;
   }, fetcher);
 
+  const { data: registeredVenue } = useSWR<{
+    venue: { followers: number } | undefined;
+  }>(() => {
+    if (!venue) return null;
+    return `/api/venue?venue=${venue.displayName.text.toLowerCase().replace(/\s+/g, "-")}`;
+  }, fetcher);
+
   const { data: photos } = useSWR<Array<string>>(
     () => {
       if (!venue) return null;
@@ -57,7 +64,13 @@ export default function Home() {
 
   return (
     <main>
-      <Sidebar parties={parties} photos={photos} venue={venue} setId={setId} />
+      <Sidebar
+        registeredVenue={registeredVenue}
+        parties={parties}
+        photos={photos}
+        venue={venue}
+        setId={setId}
+      />
       <Map id={id} setId={setId} />
     </main>
   );
