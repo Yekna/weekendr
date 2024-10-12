@@ -23,7 +23,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           },
         });
         if (owner && bcrypt.compareSync(password, owner.password)) {
-          return { name: owner.username };
+          return { name: owner.username, premium: owner.premium };
         }
         return null;
       },
@@ -33,5 +33,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
   pages: {
     signIn: "/login",
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.premium = user.premium;
+      }
+      return token;
+    },
   },
 });

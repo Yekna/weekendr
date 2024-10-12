@@ -134,7 +134,7 @@ export default function CreateParty() {
           </section>
         </div>
         <div>
-          <span>Choose party banner</span>
+          <span>Choose party banner:</span>
           <UploadButton
             className="uploadthing"
             endpoint="imageUploader"
@@ -150,16 +150,14 @@ export default function CreateParty() {
             }}
             config={{ mode: "auto" }}
             onUploadError={(e) => {
-              setTouched({ media: true });
-              setFieldError(
-                "media",
-                e.toString(),
+              setTouched({ media: true }).then(() =>
+                setFieldError("media", e.message),
               );
             }}
           />
           {errors.media && touched.media && (
             <p className="text-red-500 italic">
-              Max Image Size is 4MB. Please choose a different image.
+              {errors.media}
             </p>
           )}
           {!errors.media && touched.media && (
