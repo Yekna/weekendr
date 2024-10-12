@@ -46,6 +46,7 @@ model Owner {
   taxPictures String[]
   venues      Venue[]
   verified    Boolean  @default(false)
+  premium     Boolean  @default(false)
 }
 
 model Venue {
