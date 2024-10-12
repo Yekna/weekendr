@@ -15,4 +15,4 @@ I tried searching online for a web application that could help me with my proble
 2. Configure environment variables in .env.local and .env
 3. `npm run dev`
 
-NOTE: If developing in firefox be sure to go into console settings and uncheck Disable HTTP Cache (when toolbas is open)
+NOTE: If developing in firefox be sure to go into console settings and uncheck Disable HTTP Cache (when toolbox is open)
