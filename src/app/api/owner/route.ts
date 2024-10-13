@@ -9,6 +9,9 @@ export async function POST(req: Request) {
         username,
       },
     },
+    orderBy: {
+      name: "asc",
+    },
   });
 
   return Response.json({

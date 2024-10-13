@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
+import ProfileFilter from "@/components/ProfileFilter";
 import { Venue } from "@prisma/client";
 import { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -31,36 +31,9 @@ export default async function Profile() {
   return (
     <main
       style={{ minHeight: "calc(100dvh - 64px)" }}
-      className="flex justify-center gap-5 flex-col items-center mx-auto max-w-[1280px] w-4/5"
+      className="mx-auto max-w-[1280px] w-4/5 pt-3"
     >
-      <h1>Your Venues:</h1>
-      {/* TODO: use something else for mobile */}
-      <div className="card">
-        {venues.map((venue) => (
-          <Link
-            className="group"
-            href={`/${venue.slug}`}
-            target="_blank"
-            key={venue.id}
-          >
-            <span>
-              {venue.name}{" "}
-              <svg
-                className="hidden group-hover:inline"
-                stroke="currentColor"
-                fill="currentColor"
-                strokeWidth="0"
-                viewBox="0 0 24 24"
-                height="1em"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M18.25 15.5a.75.75 0 0 1-.75-.75V7.56L7.28 17.78a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L16.44 6.5H9.25a.75.75 0 0 1 0-1.5h9a.75.75 0 0 1 .75.75v9a.75.75 0 0 1-.75.75Z"></path>
-              </svg>
-            </span>
-          </Link>
-        ))}
-      </div>
+      <ProfileFilter venues={venues} />
     </main>
   );
 }
