@@ -15,13 +15,10 @@ const Parties: FC<Props> = ({ parties, noPartiesPlaceholder }) => {
     return <div style={{ minHeight: "calc(100dvh - 64px)" }}>Loading...</div>;
 
   return (
-    <ul
-      className="grid gap-1"
-      style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}
-    >
+    <ul className="grid gap-5 grid-cols-2 md:grid-cols-3">
       {parties.length ? (
         parties.map((venue) => (
-          <li key={venue.id} className="relative h-64">
+          <li key={venue.id} className="relative h-32 md:h-64">
             <Link
               onClick={(e) => {
                 e.preventDefault();
