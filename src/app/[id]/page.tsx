@@ -15,20 +15,25 @@ type ExtendedParty = Party & {
 };
 
 export default function Profile() {
-  // TODO: compare the session username with the owner of the current venue being viewed
+  // TODO: MAYBE LET EVERY VENUE HAVE A PROFILE THAT'S EMPTY IF THEY ARENT REGISTERED
   const session = useSession();
   const { id } = useParams<{ id: string }>();
   const [following, setFollowing] = useLocalStorage<string[]>("following", []);
 
-  const { data: venue } = useSWR<Venue | undefined>(
-    `/api/venue?venue=${id}`,
-    (url: string) =>
-      fetch(url)
-        .then((res) => res.json())
-        .then(({ venue }) => {
-          document.title = venue ? venue.name : "Not Found";
-          return venue;
-        }),
+  const { data: venue } = useSWR<
+    | (Venue & {
+        owner: {
+          username: string;
+        };
+      })
+    | undefined
+  >(`/api/venue?venue=${id}`, (url: string) =>
+    fetch(url)
+      .then((res) => res.json())
+      .then(({ venue }) => {
+        document.title = venue ? venue.name : "Not Found";
+        return venue;
+      }),
   );
 
   const { data: parties } = useSWR<ExtendedParty[] | undefined>(
@@ -79,53 +84,61 @@ export default function Profile() {
               </span>
             </div>
             <div className="mt-4 flex gap-2 flex-wrap">
-              <Button
-                onClick={async () => {
-                  setFollowing((ids) =>
-                    ids.length
-                      ? following.find((f) => f === venue.id)
-                        ? following.filter((f) => f !== venue.id)
-                        : [...ids, venue.id]
-                      : [venue.id],
-                  );
+              {session.data?.user?.name !== venue.owner.username && (
+                <Button
+                  onClick={async () => {
+                    setFollowing((ids) =>
+                      ids.length
+                        ? following.find((f) => f === venue.id)
+                          ? following.filter((f) => f !== venue.id)
+                          : [...ids, venue.id]
+                        : [venue.id],
+                    );
 
-                  mutate(
-                    `/api/venue?venue=${id}`,
-                    {
-                      followers: "|",
-                      name: venue.name,
-                      picture: venue.picture,
-                      posts: parties?.length,
-                      about: venue.about,
-                    },
-                    false,
-                  );
+                    mutate(
+                      `/api/venue?venue=${id}`,
+                      {
+                        followers: "|",
+                        name: venue.name,
+                        picture: venue.picture,
+                        posts: parties?.length,
+                        about: venue.about,
+                        owner: venue.owner,
+                      },
+                      false,
+                    );
 
-                  const res = await fetch("/api/venue", {
-                    method: "PATCH",
-                    body: JSON.stringify({
-                      id: venue.id,
-                      followers: venue.followers,
-                      following,
-                    }),
-                  });
+                    const res = await fetch("/api/venue", {
+                      method: "PATCH",
+                      body: JSON.stringify({
+                        id: venue.id,
+                        followers: venue.followers,
+                        following,
+                      }),
+                    });
 
-                  if (res.ok) {
-                    console.log("uraaaa");
-                    mutate(`/api/venue?venue=${id}`);
-                  } else {
-                    console.log("kurcina");
-                  }
-                }}
-                className="rounded-lg"
-              >
-                {following.find((f) => f === venue.id) ? "Following" : "Follow"}
-              </Button>
-              <Link target="_blank" href={`/${id}/create`}>
-                <Button className="bg-gray-200 text-gray-700">
-                  Create Party
+                    if (res.ok) {
+                      console.log("uraaaa");
+                      mutate(`/api/venue?venue=${id}`);
+                    } else {
+                      console.log("kurcina");
+                    }
+                  }}
+                  className="rounded-lg"
+                >
+                  {following.find((f) => f === venue.id)
+                    ? "Following"
+                    : "Follow"}
                 </Button>
-              </Link>
+              )}
+              {session.data?.user?.name === venue.owner.username && (
+                <Button
+                  href={`/${id}/create`}
+                  className="bg-gray-200 text-gray-700"
+                >
+                  Post New Party
+                </Button>
+              )}
             </div>
           </div>
         </div>
