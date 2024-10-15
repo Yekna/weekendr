@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import prisma from "../../../../prisma/client";
+import nodemailer from "nodemailer";
 
 // TODO: use zod for schema validation for form data and venuesData
 export async function POST(req: Request) {
@@ -70,6 +71,33 @@ export async function POST(req: Request) {
 
     await prisma.venue.createMany({ data }).catch(console.log);
 
+    // send email
+    // const transporter = nodemailer.createTransport({
+    //   host: "mail.privateemail.com",
+    //   port: 587,
+    //   secure: process.env.NODE_ENV === "development" ? false : true,
+    //   auth: {
+    //     user: process.env.ADMIN_EMAIL,
+    //     pass: process.env.PRIVATE_EMAIL_PASSWORD,
+    //   },
+    // });
+    //
+    // // TODO: use email for registration
+    // const mail = await transporter.sendMail({
+    //   from: process.env.ADMIN_EMAIL,
+    //   to: process.env.ADMIN_EMAIL,
+    //   subject: `${username} wants to sign up`,
+    //   html: `
+    //     <style>
+    //       a { background: salmon; color: white; }
+    //     </style>
+    //     <p>Hi, Boss</p>
+    //     <p>A user with the email ${username}@gmail.com wants to register</p>
+    //     <p>Tax returns:</p>
+    //     <a href="${taxPictures[0]}">${username} tax image</a>
+    //   `,
+    // });
+
     return Response.json({
       message: "Registered",
     });
@@ -115,6 +143,13 @@ export async function GET(req: Request) {
   const venue = await prisma.venue.findFirst({
     where: {
       slug,
+    },
+    include: {
+      owner: {
+        select: {
+          username: true,
+        },
+      },
     },
   });
 
