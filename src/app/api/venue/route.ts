@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import prisma from "../../../../prisma/client";
 import nodemailer from "nodemailer";
+import { z } from "zod";
 
 // TODO: use zod for schema validation for form data and venuesData
 export async function POST(req: Request) {
@@ -15,6 +16,34 @@ export async function POST(req: Request) {
     venues: string[];
     taxPictures: string[];
   } = await req.json();
+
+  const schema = z.object({
+    username: z
+      .string({ required_error: "Username is required" })
+      .min(3, { message: "Username needs to be at least 3 characters long" }),
+    password: z
+      .string({ required_error: "Password is required" })
+      .min(10, { message: "Password needs to be at least 10 characters long" }),
+    venues: z
+      .array(z.string().min(27), {
+        required_error: "At least 1 venue needs to be selected",
+      })
+      .min(1),
+    taxPictures: z
+      .array(z.string().url(), {
+        required_error:
+          "You are required to send a picture of your tax returns",
+      })
+      .min(1),
+  });
+
+  const result = schema.safeParse({ username, password, venues, taxPictures });
+  if (!result.success) {
+    return Response.json({
+      message: result.error.errors[0].message,
+    });
+  }
+
   try {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
@@ -29,7 +58,7 @@ export async function POST(req: Request) {
 
     const promisesVenues: Array<Promise<any>> = [];
 
-    venues!.forEach((venue) => {
+    venues.forEach((venue) => {
       promisesVenues.push(
         fetch(
           `https://places.googleapis.com/v1/places/${venue}?fields=formattedAddress,displayName.text,photos,websiteUri,userRatingCount,rating,id,nationalPhoneNumber,internationalPhoneNumber,shortFormattedAddress,location&languageCode=en&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,

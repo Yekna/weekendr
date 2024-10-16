@@ -137,7 +137,7 @@ export default function CreateParty() {
           <span>Choose party banner:</span>
           <UploadButton
             className="uploadthing"
-            endpoint="imageUploader"
+            endpoint="imageAndVideoUploader"
             onClientUploadComplete={(e) => {
               setTouched({ media: true });
               setFieldValue(

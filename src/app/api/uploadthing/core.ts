@@ -12,7 +12,7 @@ const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
 export const ourFileRouter = {
   // Define as many FileRoutes as you like, each with a unique routeSlug
   // TODO: change endpoint name
-  imageUploader: f({
+  imageAndVideoUploader: f({
     image: { maxFileSize: "4MB", maxFileCount: 10 },
     video: { maxFileSize: "16MB", maxFileCount: 1 },
   })
@@ -39,6 +39,28 @@ export const ourFileRouter = {
           "You do no have permission to upload videos. Please consider purchasing a premium plan",
         );
       }
+
+      // If you throw, the user will not be able to upload
+      if (!user) throw new UploadThingError("Unauthorized");
+
+      // Whatever is returned here is accessible in onUploadComplete as `metadata`
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      // This code RUNS ON YOUR SERVER after upload
+      console.log("Upload complete for userId:", metadata.userId);
+
+      console.log("file url", file.url);
+
+      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      return { uploadedBy: metadata.userId };
+    }),
+  imageUploader: f({
+    image: { maxFileSize: "4MB", maxFileCount: 10 },
+  })
+    .middleware(async ({ req }) => {
+      // This code runs on your server before upload
+      const user = await auth(req);
 
       // If you throw, the user will not be able to upload
       if (!user) throw new UploadThingError("Unauthorized");

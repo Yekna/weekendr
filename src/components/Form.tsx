@@ -18,11 +18,15 @@ const validationSchema = z.object({
     .string({ required_error: "Password is required" })
     .min(10, { message: "Password needs to be at least 10 characters long" }),
   venues: z
-    .array(z.string().min(27))
-    .min(1, { message: "At least 1 venue needs to be selected" }),
-  taxPictures: z.array(z.string().url()).min(1, {
-    message: "One or more files are bigger than allowed for their type",
-  }),
+    .array(z.string().min(27), {
+      required_error: "At least 1 venue needs to be selected",
+    })
+    .min(1),
+  taxPictures: z
+    .array(z.string().url(), {
+      required_error: "You are required to send a picture of your tax returns",
+    })
+    .min(1),
 });
 
 const Form: FC<Props> = () => {
@@ -63,9 +67,8 @@ const Form: FC<Props> = () => {
 
   return (
     <div className="w-full">
-      <h1 className="mb-5 text-4xl tracking-wide font-bold">
-        Stand Out From The Crowd. <br />
-        Register your venue.
+      <h1 className="mb-5 text-4xl max-w-[21ch] tracking-wide font-bold">
+        Stand Out From The Crowd. Register your venue.
       </h1>
       <form
         className="flex flex-col gap-5 sm:mb-0 mb-20"
