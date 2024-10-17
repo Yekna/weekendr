@@ -36,19 +36,10 @@ const Map: FC<Props> = ({ setId, id }) => {
   const venueRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapRef | null>(null);
   const [showTutorial, setShowTutorial] = useLocalStorage("showTutorial", true);
-  const [viewport, setViewport] = useLocalStorage<ViewState>("viewport", {
-    latitude: 0,
-    longitude: 0,
-    zoom: 10,
-    bearing: 0,
-    pitch: 30,
-    padding: {
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-    },
-  });
+  const [viewport, setViewport] = useLocalStorage<ViewState | undefined>(
+    "viewport",
+    undefined,
+  );
   const isSmallScreen = useMediaQuery("(max-width: 640px)");
 
   const [location, setLocation] = useState("");
@@ -211,7 +202,7 @@ const Map: FC<Props> = ({ setId, id }) => {
       };
       const tour = driver(options);
       tour.drive();
-    } 
+    }
   }, [venues, showTutorial, setShowTutorial, isSmallScreen]);
 
   useEffect(() => {
@@ -238,31 +229,38 @@ const Map: FC<Props> = ({ setId, id }) => {
     refetchData();
   }, [revalidate]);
 
-  // TODO: figure out a better way to check if the user has visited the site for the first time
   useEffect(() => {
-    if (!viewport.longitude && !viewport.latitude) {
+    if (!viewport) {
       fetch("https://ipapi.co/json/")
         .then((res) => res.json())
         .then((data) =>
-          setViewport((v) => ({
-            ...v,
+          setViewport(() => ({
             latitude: data.latitude,
             longitude: data.longitude,
+            zoom: 10,
+            bearing: 0,
+            pitch: 30,
+            padding: {
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+            },
           })),
         );
     }
-  }, [viewport.latitude, viewport.longitude, setViewport]);
+  }, [viewport, setViewport]);
 
   const changeViewport = useCallback(
     async (latitude: number, longitude: number) => {
-      setViewport((v) => ({ ...v, latitude, longitude }));
+      setViewport((v) => v && { ...v, latitude, longitude });
       setLocation("");
       setRevalidate(true);
     },
     [setViewport],
   );
 
-  if (!data || (!viewport.longitude && !viewport.latitude)) return;
+  if (!data || !viewport) return;
 
   return (
     <div
