@@ -109,6 +109,10 @@ input:focus ~ .bar:after {
   opacity: 1;
 }
 
+.radio-input {
+  display: none;
+}
+
 .radio-tile {
   display: flex;
   flex-direction: column;
