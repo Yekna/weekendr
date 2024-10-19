@@ -13,8 +13,6 @@ import { useState } from "react";
 import useSWR from "swr";
 import { Spinner } from "@/components/Spinner";
 import Button from "@/components/Button2";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -29,14 +27,6 @@ const validationSchema = z.object({
 });
 
 export default function CreateParty() {
-  const { status } = useSession();
-  const router = useRouter();
-
-  // TODO: implement middleware instead
-  if (status === "unauthenticated") {
-    router.push("/");
-  }
-
   const [message, setMessage] = useState("");
   const { id } = useParams<{ id: string }>();
   const { data } = useSWR<{ venue: Venue }>(`/api/venue?venue=${id}`, fetcher);
@@ -156,9 +146,7 @@ export default function CreateParty() {
             }}
           />
           {errors.media && touched.media && (
-            <p className="text-red-500 italic">
-              {errors.media}
-            </p>
+            <p className="text-red-500 italic">{errors.media}</p>
           )}
           {!errors.media && touched.media && (
             <p className="text-[#5264ae] italic">

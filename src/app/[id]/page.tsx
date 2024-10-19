@@ -5,7 +5,6 @@ import Button from "@/components/Button2";
 import { useParams } from "next/navigation";
 import { Party, Venue } from "@prisma/client";
 import { useLocalStorage } from "usehooks-ts";
-import Link from "next/link";
 import { useSession } from "next-auth/react";
 import Parties from "@/components/Parties3";
 import useSWR, { mutate } from "swr";
@@ -84,7 +83,7 @@ export default function Profile() {
               </span>
             </div>
             <div className="mt-4 flex gap-2 flex-wrap">
-              {session.data?.user?.name !== venue.owner.username && (
+              {session.data?.user?.name !== venue?.owner.username && (
                 <Button
                   onClick={async () => {
                     setFollowing((ids) =>

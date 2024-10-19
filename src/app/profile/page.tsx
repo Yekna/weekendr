@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import ProfileFilter from "@/components/ProfileFilter";
 import { Venue } from "@prisma/client";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Profile",
@@ -12,16 +11,11 @@ export const metadata: Metadata = {
 export default async function Profile() {
   const session = await auth();
 
-  // TODO: use middleware instead
-  if (!session || !session.user) {
-    redirect("/");
-  }
-
   const { venues }: { venues: Array<Venue> } = await fetch(
     `${process.env.WEBSITE_URL}/api/owner`,
     {
       method: "POST",
-      body: JSON.stringify({ username: session.user.name }),
+      body: JSON.stringify({ username: session?.user?.name }),
       headers: {
         "Content-Type": "application/json",
       },
