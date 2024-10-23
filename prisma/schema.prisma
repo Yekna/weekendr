@@ -56,8 +56,8 @@ model Venue {
   address      String  @unique
   parties      Party[]
   phone        String?
-  owner        Owner   @relation(fields: [ownerId], references: [id])
-  ownerId      Int
+  owner        Owner?  @relation(fields: [ownerId], references: [id])
+  ownerId      Int?
   rating       Int
   website      String?
   ratingsCount Int

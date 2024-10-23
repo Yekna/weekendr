@@ -144,16 +144,47 @@ export async function PATCH(req: Request) {
     following: string[];
   };
 
-  await prisma.venue.update({
-    where: {
-      id: id,
-    },
-    data: {
-      followers: following.find((f) => f === id)
-        ? followers - 1
-        : followers + 1,
-    },
-  });
+  try {
+    await prisma.venue.update({
+      where: {
+        id,
+      },
+      data: {
+        followers: following.find((f) => f === id)
+          ? followers - 1
+          : followers + 1,
+      },
+    });
+  } catch (e) {
+    // if venue doesn't exist create it
+    // TODO: check ip address and make sure nobody can use this more than 10 times within a minute for example
+    const googlePlacesVenue = await fetch(
+      `${process.env.WEBSITE_URL}/api/venues/${id}`,
+    ).then((res) => res.json());
+
+    const googlePlacesVenueImage = await fetch(
+      `https://places.googleapis.com/v1/${googlePlacesVenue.photos[0].name}/media?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
+    ).then((res) => res.json());
+
+    await prisma.venue.create({
+      data: {
+        address: googlePlacesVenue.formattedAddress,
+        id: googlePlacesVenue.id,
+        name: googlePlacesVenue.displayName.text,
+        phone: googlePlacesVenue.internationalPhoneNumber || "",
+        picture: googlePlacesVenueImage.photoUri,
+        rating: googlePlacesVenue.rating || 0,
+        website: googlePlacesVenue.websiteUri || "",
+        ratingsCount: googlePlacesVenue.userRatingCount || 0,
+        lat: googlePlacesVenue.location.latitude,
+        lng: googlePlacesVenue.location.longitude,
+        slug: googlePlacesVenue.displayName.text
+          .toLowerCase()
+          .replace(/\s+/g, "-"),
+        followers: 1,
+      },
+    });
+  }
 
   return Response.json({
     message: "Successfully updated entry",
@@ -181,6 +212,43 @@ export async function GET(req: Request) {
       },
     },
   });
+
+  // create temporary venue so users don't see 99% of our venues aren't registered
+  if (!venue) {
+    //   // find venue in google places
+    const { candidates } = await fetch(
+      `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?inputtype=textquery&input=${slug}&fields=place_id,photos&key=${process.env.GOOGLE_PLACES_API_KEY}`,
+    ).then((res) => res.json());
+
+    // Use places 2.0
+    const googlePlacesVenue = await fetch(
+      `${process.env.WEBSITE_URL}/api/venues/${candidates[0].place_id}`,
+    ).then((res) => res.json());
+
+    //  fetch picture
+    const googlePlacesVenueImage = await fetch(
+      `https://places.googleapis.com/v1/${googlePlacesVenue.photos[0].name}/media?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
+    ).then((res) => res.json());
+
+    const venue = {
+      address: googlePlacesVenue.formattedAddress,
+      id: googlePlacesVenue.id,
+      name: googlePlacesVenue.displayName.text,
+      phone: googlePlacesVenue.internationalPhoneNumber || "",
+      picture: googlePlacesVenueImage.photoUri,
+      rating: googlePlacesVenue.rating || 0,
+      website: googlePlacesVenue.websiteUri || "",
+      ratingsCount: googlePlacesVenue.userRatingCount || 0,
+      lat: googlePlacesVenue.location.latitude,
+      lng: googlePlacesVenue.location.longitude,
+      slug: googlePlacesVenue.displayName.text
+        .toLowerCase()
+        .replace(/\s+/g, "-"),
+      followers: 0,
+    };
+    
+    return Response.json({ venue });
+  }
 
   return Response.json({
     venue,

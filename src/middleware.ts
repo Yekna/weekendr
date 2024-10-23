@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
     ).then((res) => res.json());
 
     if (!data) return NextResponse.redirect(new URL("/", request.url));
-    if (data.venue.owner.username !== session.user?.name)
+    if (data.venue.owner?.username !== session.user?.name)
       return NextResponse.redirect(
         new URL(`/${request.nextUrl.pathname.split("/")[1]}`, request.url),
       );

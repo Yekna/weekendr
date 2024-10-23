@@ -192,14 +192,6 @@ const Sidebar: FC<Props> = ({
             <Button
               className="step-3"
               onClick={async () => {
-                setIds((ids) =>
-                  ids.length
-                    ? ids.find((f) => f === venue?.id)
-                      ? ids.filter((f) => f !== venue?.id)
-                      : [...ids, venue?.id || ""]
-                    : [venue?.id || ""],
-                );
-
                 const res = await fetch("/api/venue", {
                   method: "PATCH",
                   body: JSON.stringify({
@@ -210,6 +202,13 @@ const Sidebar: FC<Props> = ({
                 });
 
                 if (res.ok) {
+                  setIds((ids) =>
+                    ids.length
+                      ? ids.find((f) => f === venue?.id)
+                        ? ids.filter((f) => f !== venue?.id)
+                        : [...ids, venue?.id || ""]
+                      : [venue?.id || ""],
+                  );
                   console.log("ura");
                 } else {
                   console.log("uva");

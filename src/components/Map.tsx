@@ -269,7 +269,7 @@ const Map: FC<Props> = ({ setId, id }) => {
     >
       <ReactMapGl
         style={{ position: "relative" }}
-        minZoom={15}
+        minZoom={isSmallScreen ? 14 : 15}
         maxZoom={18}
         ref={mapRef}
         {...viewport}
