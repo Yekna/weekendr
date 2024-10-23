@@ -14,8 +14,6 @@ type ExtendedParty = Party & {
 };
 
 export default function Profile() {
-  // TODO: MAYBE LET EVERY VENUE HAVE A PROFILE THAT'S EMPTY IF THEY ARENT REGISTERED
-  // MAYBE ONCE SOMEBODY GOES TO THE PROFILE PAGE OF A VENUE CHECK IF IT EXISTS IN THE DB AND IF NOT CREATE ONE WITHOUT A VENUE OWNER AND RENDER THE PAGE AND THEN YOU CAN FOLLOW HOW MANY FOLLOWERS THAT VENUE HAS OR WILL HAVE ONCE SOMEBODY TAKES OWNERSHIP OF THAT VENUE WHEN THEY REGISTER
   const session = useSession();
   const { id } = useParams<{ id: string }>();
   const [following, setFollowing] = useLocalStorage<string[]>("following", []);
@@ -32,8 +30,8 @@ export default function Profile() {
     (url: string) =>
       fetch(url)
         .then((res) => res.json())
-        .then(({ venue }) => {
-          document.title = venue ? venue.name : "Not Found";
+        .then((venue) => {
+          document.title = venue.name;
           return venue;
         }),
   );
@@ -49,15 +47,7 @@ export default function Profile() {
   if (isLoading) {
     return <main style={{ minHeight: "calc(100dvh - 64px)" }}>loading...</main>;
   }
-  if (!venue) {
-    return (
-      <main style={{ minHeight: "calc(100dvh - 64px)" }}>
-        Sorry that venue isn&apos;t registered on Weekendr yet
-      </main>
-    );
-  }
-
-  console.log({ venue });
+  if (!venue) return <div style={{ minHeight: "calc(100dvh - 64px)" }}></div>;
 
   return (
     <main
@@ -89,55 +79,60 @@ export default function Profile() {
               </span>
             </div>
             <div className="mt-4 flex gap-2 flex-wrap">
-              {/*TODO: check if venue exists in db and if it doesn't create one and follow it. Also implement the same thing for the sidebar follow button */}
-              <Button
-                onClick={async () => {
-                  mutate(
-                    `/api/venue?venue=${id}`,
-                    {
-                      followers: "|",
-                      name: venue.name,
-                      picture: venue.picture,
-                      posts: parties?.length,
-                      about: venue.about,
-                      owner: venue.owner,
-                    },
-                    false,
-                  );
-
-                  const res = await fetch("/api/venue", {
-                    method: "PATCH",
-                    body: JSON.stringify({
-                      id: venue.id,
-                      followers: venue.followers,
-                      following,
-                    }),
-                  });
-
-                  if (res.ok) {
-                    mutate(`/api/venue?venue=${id}`).then(() =>
-                      setFollowing((ids) =>
-                        ids.length
-                          ? following.find((f) => f === venue.id)
-                            ? following.filter((f) => f !== venue.id)
-                            : [...ids, venue.id]
-                          : [venue.id],
-                      ),
+              {session.data?.user?.name !== venue?.owner?.username && (
+                <Button
+                  onClick={async () => {
+                    mutate(
+                      `/api/venue?venue=${id}`,
+                      {
+                        followers: "|",
+                        name: venue.name,
+                        picture: venue.picture,
+                        posts: parties?.length,
+                        about: venue.about,
+                        owner: venue.owner,
+                      },
+                      false,
                     );
-                  } else {
-                    console.log("kurcina");
-                  }
-                }}
-                className="rounded-lg"
-              >
-                {following.find((f) => f === venue.id) ? "Following" : "Follow"}
-              </Button>
-              <Button
-                href={`/${id}/create`}
-                className="bg-gray-200 text-gray-700"
-              >
-                Post New Party
-              </Button>
+
+                    const res = await fetch("/api/venue", {
+                      method: "PATCH",
+                      body: JSON.stringify({
+                        id: venue.id,
+                        followers: venue.followers,
+                        following,
+                      }),
+                    });
+
+                    if (res.ok) {
+                      mutate(`/api/venue?venue=${id}`).then(() =>
+                        setFollowing((ids) =>
+                          ids.length
+                            ? following.find((f) => f === venue.id)
+                              ? following.filter((f) => f !== venue.id)
+                              : [...ids, venue.id]
+                            : [venue.id],
+                        ),
+                      );
+                    } else {
+                      console.log("kurcina");
+                    }
+                  }}
+                  className="rounded-lg"
+                >
+                  {following.find((f) => f === venue.id)
+                    ? "Following"
+                    : "Follow"}
+                </Button>
+              )}
+              {session.data?.user?.name === venue?.owner?.username && (
+                <Button
+                  href={`/${id}/create`}
+                  className="bg-gray-200 text-gray-700"
+                >
+                  Post New Party
+                </Button>
+              )}
             </div>
           </div>
         </div>

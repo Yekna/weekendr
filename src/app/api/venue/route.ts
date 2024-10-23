@@ -3,7 +3,6 @@ import prisma from "../../../../prisma/client";
 import nodemailer from "nodemailer";
 import { z } from "zod";
 
-// TODO: use zod for schema validation for form data and venuesData
 export async function POST(req: Request) {
   const {
     username,
@@ -98,6 +97,7 @@ export async function POST(req: Request) {
       slug: venue.displayName.text.toLowerCase().replace(/\s+/g, "-"),
     }));
 
+    // TODO: check if venue exists first and if it does associate it with the owner
     await prisma.venue.createMany({ data }).catch(console.log);
 
     // send email
@@ -235,7 +235,7 @@ export async function GET(req: Request) {
       id: googlePlacesVenue.id,
       name: googlePlacesVenue.displayName.text,
       phone: googlePlacesVenue.internationalPhoneNumber || "",
-      picture: googlePlacesVenueImage.photoUri,
+      picture: googlePlacesVenueImage.photoUri || "/placeholder.png",
       rating: googlePlacesVenue.rating || 0,
       website: googlePlacesVenue.websiteUri || "",
       ratingsCount: googlePlacesVenue.userRatingCount || 0,
@@ -246,11 +246,9 @@ export async function GET(req: Request) {
         .replace(/\s+/g, "-"),
       followers: 0,
     };
-    
-    return Response.json({ venue });
+
+    return Response.json(venue);
   }
 
-  return Response.json({
-    venue,
-  });
+  return Response.json(venue);
 }
