@@ -31,7 +31,7 @@ export default function Profile() {
       fetch(url)
         .then((res) => res.json())
         .then((venue) => {
-          document.title = venue.name;
+          // document.title = venue.name;
           return venue;
         }),
   );

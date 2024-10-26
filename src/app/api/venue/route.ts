@@ -195,9 +195,7 @@ export async function GET(req: Request) {
   const slug = new URL(req.url).searchParams.get("venue");
 
   if (!slug) {
-    return Response.json({
-      venue: undefined,
-    });
+    return Response.json({ error: 'You forgot to send a slug' });
   }
 
   const venue = await prisma.venue.findFirst({
