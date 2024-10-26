@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+// TODO: figure out how to generate custom image for og:image.
 export async function generateMetadata({
   params,
 }: {
@@ -7,10 +8,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = params;
 
-  if(id === 'service-worker.js') {
+  if (id === "service-worker.js") {
     return {
-      title: "Service Worker"
-    }
+      title: "Service Worker",
+    };
   }
 
   const data = await fetch(
@@ -19,19 +20,18 @@ export async function generateMetadata({
 
   return {
     title: `Weekendr - ${data.name}`,
-    description: data?.description
-      ? `${data.name} - ${data.description}`
-      : "No description for this venue",
+    description: data?.about ?? "No description for this venue",
     metadataBase: new URL(process.env.WEBSITE_URL as string),
     openGraph: {
       url: `${process.env.WEBSITE_URL}/${id}`,
       siteName: "Weekendr",
       type: "profile",
+      description: data?.about ?? "No description for this venue",
     },
   };
 }
 
-export default function CreateLayout({
+export default function ProfileLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
