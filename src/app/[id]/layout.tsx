@@ -20,13 +20,13 @@ export async function generateMetadata({
 
   return {
     title: `Weekendr - ${data.name}`,
-    description: `${data.followers} Followers, ${data.parties.length} Posts - See Upcoming Parties from ${data.name}`,
+    description: `${data.followers} Followers, ${data.parties.length} Posts - ${data.name} (@${data.slug}) on Weekendr${data?.about ? `: "${data.about}"` : ""}`,
     metadataBase: new URL(process.env.WEBSITE_URL as string),
     openGraph: {
       url: `${process.env.WEBSITE_URL}/${id}`,
       siteName: "Weekendr",
       type: "profile",
-      description: `${data.followers} Followers, ${data.parties.length} Posts - See Upcoming Parties from ${data.name}`,
+      description: `${data.followers} Followers, ${data.parties.length} Posts - See Upcoming Parties from ${data.name} (@${data.slug})`,
     },
   };
 }
