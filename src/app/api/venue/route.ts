@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import prisma from "../../../../prisma/client";
 import nodemailer from "nodemailer";
 import { z } from "zod";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const {
@@ -194,8 +195,10 @@ export async function PATCH(req: Request) {
 export async function GET(req: Request) {
   const slug = new URL(req.url).searchParams.get("venue");
 
+  console.log({ slug });
+
   if (!slug) {
-    return Response.json({ error: 'You forgot to send a slug' });
+    return Response.json({ error: "You forgot to send a slug" });
   }
 
   const venue = await prisma.venue.findFirst({
@@ -245,7 +248,7 @@ export async function GET(req: Request) {
       followers: 0,
     };
 
-    return Response.json(venue);
+    return NextResponse.json(venue, { status: 200 });
   }
 
   return Response.json(venue);
