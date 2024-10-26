@@ -195,8 +195,6 @@ export async function PATCH(req: Request) {
 export async function GET(req: Request) {
   const slug = new URL(req.url).searchParams.get("venue");
 
-  console.log({ slug });
-
   if (!slug) {
     return Response.json({ error: "You forgot to send a slug" });
   }
@@ -209,6 +207,11 @@ export async function GET(req: Request) {
       owner: {
         select: {
           username: true,
+        },
+      },
+      parties: {
+        select: {
+          id: true,
         },
       },
     },
@@ -246,6 +249,7 @@ export async function GET(req: Request) {
         .toLowerCase()
         .replace(/\s+/g, "-"),
       followers: 0,
+      parties: [],
     };
 
     return NextResponse.json(venue, { status: 200 });
