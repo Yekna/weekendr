@@ -25,7 +25,7 @@ type Props = {
   };
   parties?: Array<Party & { Venue: { name: string } }>;
   setId: Dispatch<SetStateAction<string>>;
-  registeredVenue?: { venue: { followers: number } | undefined };
+  registeredVenue?: { followers: number } | undefined;
 };
 
 const Sidebar: FC<Props> = ({
@@ -196,7 +196,7 @@ const Sidebar: FC<Props> = ({
                   method: "PATCH",
                   body: JSON.stringify({
                     id: venue?.id,
-                    followers: registeredVenue?.venue?.followers,
+                    followers: registeredVenue?.followers,
                     following: ids,
                   }),
                 });

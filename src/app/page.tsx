@@ -34,7 +34,7 @@ export default function Home() {
   }, fetcher);
 
   const { data: registeredVenue } = useSWR<{
-    venue: { followers: number } | undefined;
+    followers: number;
   }>(() => {
     if (!venue) return null;
     return `/api/venue?venue=${venue.displayName.text.toLowerCase().replace(/\s+/g, "-")}`;

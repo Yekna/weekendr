@@ -26,6 +26,7 @@
     "nodemailer": "^6.9.14",
     "react": "^18",
     "react-dom": "^18",
+    "react-hot-toast": "^2.4.1",
     "react-map-gl": "^7.1.7",
     "react-multi-carousel": "^2.8.5",
     "react-responsive-modal": "^6.4.2",
