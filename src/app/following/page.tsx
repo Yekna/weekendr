@@ -3,27 +3,28 @@
 import Button from "@/components/Button2";
 import Parties from "@/components/Parties2";
 import { Party } from "@prisma/client";
-import { ChangeEvent, useCallback, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { useLocalStorage } from "usehooks-ts";
 import toast from "react-hot-toast";
 
-// TODO: implement an export following button
 export default function Following() {
   const [ids, setIds] = useLocalStorage<string[]>("following", []);
   const [filterBy, setFilterBy] = useState("Week");
 
-  const { data: parties } = useSWR<Array<Party & { Venue: { name: string } }>>(
-    "/api/parties/",
-    async (url: string) =>
-      fetch(url, {
-        method: "POST",
-        body: JSON.stringify({ ids, filterBy }),
-        headers: { "Content-Type": "application/json" },
-      }).then((res) => res.json()),
+  const { data: parties, mutate } = useSWR<
+    Array<Party & { Venue: { name: string } }>
+  >("/api/parties/", async (url: string) =>
+    fetch(url, {
+      method: "POST",
+      body: JSON.stringify({ ids, filterBy }),
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => res.json()),
   );
 
-  console.log({ parties });
+  useEffect(() => {
+    mutate();
+  }, [filterBy, mutate]);
 
   const handleExport = useCallback(() => {
     const blob = new Blob([JSON.stringify(ids)], { type: "application/json" });
