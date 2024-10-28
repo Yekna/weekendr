@@ -19,10 +19,6 @@ type Props = {
   noPartiesPlaceholder: string;
 };
 
-type ExtendedParty = Party & {
-  Venue: Venue;
-};
-
 const Parties: FC<Props> = ({ parties, noPartiesPlaceholder }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [party, setParty] = useState<(Party & { Venue: Venue }) | undefined>();
@@ -47,7 +43,6 @@ const Parties: FC<Props> = ({ parties, noPartiesPlaceholder }) => {
                   setParty(venue);
                 }}
                 href=""
-                target="_blank"
               >
                 <Image
                   className="rounded-lg h-full w-full object-cover"
@@ -85,24 +80,22 @@ const Parties: FC<Props> = ({ parties, noPartiesPlaceholder }) => {
         }}
         classNames={{
           base: "border-[#292f46] bg-gray-900 text-[#a8b0d3] max-w-xl",
-          closeButton: "hover:bg-gray-700",
+          closeButton: "hover:bg-gray-700 active:bg-gray-700",
         }}
       >
         <ModalContent>
-          <>
-            <ModalHeader className="flex flex-col gap-1">
-              {party?.name}
-            </ModalHeader>
-            <ModalBody>
-              <Swiper className="w-full" slidesPerView={1}>
-                {party?.media.map((image) => (
-                  <SwiperSlide key={image}>
-                    <Image width={500} height={500} src={image} alt={""} />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </ModalBody>
-          </>
+          <ModalHeader className="flex flex-col gap-1">
+            {party?.name}
+          </ModalHeader>
+          <ModalBody>
+            <Swiper className="w-full">
+              {party?.media.map((image) => (
+                <SwiperSlide key={image}>
+                  <Image width={528} height={0} src={image} alt={""} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>

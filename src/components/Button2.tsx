@@ -19,8 +19,10 @@ export const Button2: FC<Props> = ({
   disabled = false,
   href,
 }) => {
+  console.log({disabled})
   return href ? (
     <Button
+      disableAnimation={disabled}
       as={Link}
       href={href}
       type={type}
@@ -32,6 +34,7 @@ export const Button2: FC<Props> = ({
     </Button>
   ) : (
     <Button
+      disableAnimation={disabled}
       type={type}
       disabled={disabled}
       onClick={onClick}

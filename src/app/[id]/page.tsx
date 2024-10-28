@@ -36,6 +36,7 @@ export default function Profile() {
         }),
   );
 
+  // TODO: remove. You can just return parties in /api/venue?venue=${id}
   const { data: parties } = useSWR<ExtendedParty[] | undefined>(
     `/api/parties?slug=${id}`,
     (url: string) =>
@@ -130,7 +131,7 @@ export default function Profile() {
                   href={`/${id}/create`}
                   className="bg-gray-200 text-gray-700"
                 >
-                  Post New Party
+                  Create Party
                 </Button>
               )}
             </div>

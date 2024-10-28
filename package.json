@@ -10,7 +10,7 @@
     "cypress:open": "cypress open"
   },
   "dependencies": {
-    "@nextui-org/react": "^2.4.1",
+    "@nextui-org/react": "^2.4.8",
     "@paypal/react-paypal-js": "^8.4.0",
     "@prisma/client": "^5.10.2",
     "@types/bcryptjs": "^2.4.6",
