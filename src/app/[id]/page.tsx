@@ -1,54 +1,59 @@
-"use client";
-
+import ProfileStatistics from "@/components/ProfileStatistics";
+import type { Metadata } from "next";
 import Image from "next/image";
-import Button from "@/components/Button2";
-import { useParams } from "next/navigation";
-import { Party, Venue } from "@prisma/client";
-import { useLocalStorage } from "usehooks-ts";
-import { useSession } from "next-auth/react";
-import Parties from "@/components/Parties3";
-import useSWR, { mutate } from "swr";
+import { getLimitedVenue } from "@/services";
+import Parties from "@/components/Parties4";
 
-type ExtendedParty = Party & {
-  Venue: Venue;
-};
+// TODO: figure out how to generate custom image for og:image.
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const { id } = params;
 
-export default function Profile() {
-  const session = useSession();
-  const { id } = useParams<{ id: string }>();
-  const [following, setFollowing] = useLocalStorage<string[]>("following", []);
-
-  const { data: venue, isLoading } = useSWR<
-    | (Venue & {
-        owner: {
-          username: string;
-        };
-      })
-    | undefined
-  >(
-    () => (id ? `/api/venue?venue=${id}` : null),
-    (url: string) =>
-      fetch(url)
-        .then((res) => res.json())
-        .then((venue) => {
-          // document.title = venue.name;
-          return venue;
-        }),
-  );
-
-  // TODO: remove. You can just return parties in /api/venue?venue=${id}
-  const { data: parties } = useSWR<ExtendedParty[] | undefined>(
-    `/api/parties?slug=${id}`,
-    (url: string) =>
-      fetch(url)
-        .then((res) => res.json())
-        .then(({ parties }) => parties),
-  );
-
-  if (isLoading) {
-    return <main style={{ minHeight: "calc(100dvh - 64px)" }}>loading...</main>;
+  if (id === "service-worker.js" || id === "installHook.js.map") {
+    return {
+      title: "Service Worker",
+    };
   }
-  if (!venue) return <div style={{ minHeight: "calc(100dvh - 64px)" }}></div>;
+
+  const data = await getLimitedVenue(id, {
+    parties: { select: { id: true } },
+    followers: true,
+    name: true,
+    slug: true,
+    about: true,
+  }).then((res) => res.json());
+
+  return {
+    title: `Weekendr - ${data.name}`,
+    description: `${data.followers} Followers, ${data.parties.length} Posts - ${data.name} (@${data.slug}) on Weekendr${data?.about ? `: "${data.about}"` : ""}`,
+    metadataBase: new URL(process.env.WEBSITE_URL as string),
+    openGraph: {
+      url: `${process.env.WEBSITE_URL}/${id}`,
+      siteName: "Weekendr",
+      type: "profile",
+      description: `${data.followers} Followers, ${data.parties.length} Posts - See Upcoming Parties from ${data.name} (@${data.slug})`,
+    },
+  };
+}
+
+export default async function Profile({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const data = await getLimitedVenue(id, {
+    name: true,
+    picture: true,
+    about: true,
+  }).then((res) => res.json());
+
+  if (!data) return;
+  const { name, picture, about } = data;
 
   return (
     <main
@@ -60,88 +65,25 @@ export default function Profile() {
           <div className="flex flex-col text-center gap-3">
             <div className="sm:w-24 w-20 sm:h-24 h-20 rounded-full overflow-hidden">
               <Image
-                src={venue.picture || "/placeholder.png"}
+                src={picture || "/placeholder.png"}
                 alt="Profile Picture"
                 className="w-full h-full flex items-center object-cover"
                 width={150}
                 height={150}
               />
             </div>
-            <h2 className="sm:hidden">{venue.name}</h2>
+            <h2 className="sm:hidden">{name}</h2>
           </div>
           <div>
-            <h2 className="text-2xl sm:block hidden font-bold">{venue.name}</h2>
-            <div className="flex items-center space-x-4 mt-2">
-              <span>
-                <strong>{parties?.length}</strong> posts
-              </span>
-              <span>
-                <strong>{venue.followers}</strong> followers
-              </span>
-            </div>
-            <div className="mt-4 flex gap-2 flex-wrap">
-              {session.data?.user?.name !== venue?.owner?.username && (
-                <Button
-                  onClick={async () => {
-                    mutate(
-                      `/api/venue?venue=${id}`,
-                      {
-                        followers: "|",
-                        name: venue.name,
-                        picture: venue.picture,
-                        posts: parties?.length,
-                        about: venue.about,
-                        owner: venue.owner,
-                      },
-                      false,
-                    );
-
-                    const res = await fetch("/api/venue", {
-                      method: "PATCH",
-                      body: JSON.stringify({
-                        id: venue.id,
-                        followers: venue.followers,
-                        following,
-                      }),
-                    });
-
-                    if (res.ok) {
-                      mutate(`/api/venue?venue=${id}`).then(() =>
-                        setFollowing((ids) =>
-                          ids.length
-                            ? following.find((f) => f === venue.id)
-                              ? following.filter((f) => f !== venue.id)
-                              : [...ids, venue.id]
-                            : [venue.id],
-                        ),
-                      );
-                    } else {
-                      console.log("kurcina");
-                    }
-                  }}
-                  className="rounded-lg"
-                >
-                  {following.find((f) => f === venue.id)
-                    ? "Following"
-                    : "Follow"}
-                </Button>
-              )}
-              {session.data?.user?.name === venue?.owner?.username && (
-                <Button
-                  href={`/${id}/create`}
-                  className="bg-gray-200 text-gray-700"
-                >
-                  Create Party
-                </Button>
-              )}
-            </div>
+            <h2 className="text-2xl sm:block hidden font-bold">{name}</h2>
+            <ProfileStatistics id={id} />
           </div>
         </div>
       </div>
       <div className="mb-8">
-        <p>{venue.about}</p>
+        <p>{about}</p>
       </div>
-      <Parties parties={parties} noPartiesPlaceholder="No Posts Yet" />
+      <Parties id={id} noPartiesPlaceholder="No Posts Yet" />
     </main>
   );
 }
