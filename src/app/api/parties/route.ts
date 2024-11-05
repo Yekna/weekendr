@@ -66,7 +66,7 @@ export async function GET(req: Request) {
       },
     },
     orderBy: {
-      dateCreated: 'desc',
+      dateCreated: "desc",
     },
     take: 10,
   });

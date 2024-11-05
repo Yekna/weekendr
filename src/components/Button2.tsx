@@ -19,7 +19,6 @@ export const Button2: FC<Props> = ({
   disabled = false,
   href,
 }) => {
-  console.log({disabled})
   return href ? (
     <Button
       disableAnimation={disabled}

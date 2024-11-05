@@ -109,10 +109,6 @@ input:focus ~ .bar:after {
   opacity: 1;
 }
 
-.radio-input {
-  display: none;
-}
-
 .radio-tile {
   display: flex;
   flex-direction: column;
@@ -169,6 +165,7 @@ input:focus ~ .bar:after {
 }
 
 .radio-input {
+  display: none;
   clip: rect(0 0 0 0);
   -webkit-clip-path: inset(100%);
   clip-path: inset(100%);

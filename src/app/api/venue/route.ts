@@ -219,40 +219,44 @@ export async function GET(req: Request) {
 
   // create temporary venue so users don't see 99% of our venues aren't registered
   if (!venue) {
-    //   // find venue in google places
-    const { candidates } = await fetch(
-      `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?inputtype=textquery&input=${slug}&fields=place_id,photos&key=${process.env.GOOGLE_PLACES_API_KEY}`,
+    const { places } = await fetch(
+      "https://places.googleapis.com/v1/places:searchText",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-FieldMask":
+            "places.displayName,places.photos,places.formattedAddress,places.id,places.internationalPhoneNumber,places.rating,places.websiteUri,places.userRatingCount,places.location",
+          "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
+        } as HeadersInit,
+        body: JSON.stringify({ textQuery: slug }),
+      },
     ).then((res) => res.json());
 
-    // Use places 2.0
-    const googlePlacesVenue = await fetch(
-      `${process.env.WEBSITE_URL}/api/venues/${candidates[0].place_id}`,
-    ).then((res) => res.json());
+    const [data] = places;
 
-    //  fetch picture
     const googlePlacesVenueImage = await fetch(
-      `https://places.googleapis.com/v1/${googlePlacesVenue.photos[0].name}/media?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
+      `https://places.googleapis.com/v1/${data.photos[0].name}/media?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
     ).then((res) => res.json());
 
     const venue = {
-      address: googlePlacesVenue.formattedAddress,
-      id: googlePlacesVenue.id,
-      name: googlePlacesVenue.displayName.text,
-      phone: googlePlacesVenue.internationalPhoneNumber || "",
-      picture: googlePlacesVenueImage.photoUri || "/placeholder.png",
-      rating: googlePlacesVenue.rating || 0,
-      website: googlePlacesVenue.websiteUri || "",
-      ratingsCount: googlePlacesVenue.userRatingCount || 0,
-      lat: googlePlacesVenue.location.latitude,
-      lng: googlePlacesVenue.location.longitude,
-      slug: googlePlacesVenue.displayName.text
-        .toLowerCase()
-        .replace(/\s+/g, "-"),
+      about: "",
+      name: data.displayName.text,
+      slug: data.displayName.text.toLowerCase().replace(/\s+/g, ""),
       followers: 0,
       parties: [],
+      picture: googlePlacesVenueImage.photoUri || "/placeholder.png",
+      address: data.formattedAddress,
+      id: data.id,
+      phone: data.internationalPhoneNumber || "",
+      rating: data.rating || 0,
+      website: data.websiteUri || "",
+      ratingsCount: data.userRatingCount || 0,
+      lat: data.location.latitude,
+      lng: data.location.longitude,
     };
 
-    return NextResponse.json(venue, { status: 200 });
+    return Response.json(venue);
   }
 
   return Response.json(venue);

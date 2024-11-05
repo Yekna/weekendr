@@ -24,6 +24,7 @@ import Input from "./Input";
 import { useDebounceValue } from "usehooks-ts";
 import Button from "./Button";
 import { Config, driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -118,17 +119,16 @@ const Map: FC<Props> = ({ setId, id }) => {
 
   const { data } = useSWR<{ token: string }>("/api/token", fetcher);
   const { data: fetchedLocationData } = useSWR<{
-    results: Array<{
-      formatted_address: string;
-      geometry: {
-        location: { lat: number; lng: number };
-        viewport: {
-          northeast: { lat: number; lng: number };
-          southwest: { lat: number; lng: number };
-        };
+    places: {
+      formattedAddress: string;
+      location: {
+        latitude: number;
+        longitude: number;
       };
-      name: string;
-    }>;
+      displayName: {
+        text: string;
+      };
+    }[];
   }>(() => {
     if (!debouncedLocation) return null;
     return `/api/location/?query=${debouncedLocation}`;
@@ -329,18 +329,18 @@ const Map: FC<Props> = ({ setId, id }) => {
           />
           <div className="rounded-b-md overflow-hidden">
             {fetchedLocationData &&
-              fetchedLocationData.results.map((data) => (
+              fetchedLocationData.places.map((data) => (
                 <Button
                   className="rounded-t-none w-full hover:bg-gray-700"
-                  key={data.formatted_address}
+                  key={data.formattedAddress}
                   onClick={() =>
                     changeViewport(
-                      data.geometry.location.lat,
-                      data.geometry.location.lng,
+                      data.location.latitude,
+                      data.location.longitude,
                     )
                   }
                 >
-                  {`${data.name} (${data.formatted_address})`}
+                  {`${data.displayName.text} (${data.formattedAddress})`}
                 </Button>
               ))}
           </div>

@@ -7,8 +7,6 @@ import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "./api/uploadthing/core";
 import { NextUIProvider } from "@nextui-org/react";
 import { SessionProvider } from "next-auth/react";
-import PayPalProvider from "@/providers/PaypalProvider";
-import "driver.js/dist/driver.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +18,7 @@ export const metadata: Metadata = {
   },
   title: "Weekendr",
   description: "Find clubs and bars near you",
+  // metadataBase adds a prefix to the opengraph-image.png e.g [https://weekendr.club]/opengraph-image.png
   metadataBase: new URL(process.env.WEBSITE_URL as string),
 };
 
@@ -33,13 +32,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <SessionProvider>
           <NextUIProvider>
-            <PayPalProvider>
-              <Header />
-              <NextSSRPlugin
-                routerConfig={extractRouterConfig(ourFileRouter)}
-              />
-              {children}
-            </PayPalProvider>
+            <Header />
+            <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
+            {children}
           </NextUIProvider>
         </SessionProvider>
       </body>

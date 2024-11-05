@@ -46,6 +46,8 @@ export default async function Profile({
 }) {
   const { id } = await params;
 
+  if (id === "service-worker.js" || id === "installHook.js.map") return;
+
   const data = await getLimitedVenue(id, {
     name: true,
     picture: true,
@@ -62,20 +64,17 @@ export default async function Profile({
     >
       <div className="flex items-center gap-3 justify-between mb-8">
         <div className="flex items-center space-x-4">
-          <div className="flex flex-col text-center gap-3">
-            <div className="sm:w-24 w-20 sm:h-24 h-20 rounded-full overflow-hidden">
-              <Image
-                src={picture || "/placeholder.png"}
-                alt="Profile Picture"
-                className="w-full h-full flex items-center object-cover"
-                width={150}
-                height={150}
-              />
-            </div>
-            <h2 className="sm:hidden">{name}</h2>
+          <div className="sm:w-24 w-20 sm:h-24 h-20 rounded-full overflow-hidden">
+            <Image
+              src={picture || "/placeholder.png"}
+              alt="Profile Picture"
+              className="w-full h-full flex items-center object-cover"
+              width={150}
+              height={150}
+            />
           </div>
-          <div>
-            <h2 className="text-2xl sm:block hidden font-bold">{name}</h2>
+          <div className="grid" style={{ gridTemplateRows: "auto auto 56px" }}>
+            <h2 className="text-2xl font-bold">{name}</h2>
             <ProfileStatistics id={id} />
           </div>
         </div>
