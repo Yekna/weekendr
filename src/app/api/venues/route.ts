@@ -5,20 +5,21 @@ import { Prisma } from "@prisma/client";
 export async function GET(req: Request) {
   const value = new URL(req.url).searchParams.get("value");
 
-  // TODO: remove cities from being returned
-  const res = await fetch(
-    `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?inputtype=textquery&input=${value}&fields=formatted_address,name,place_id&key=${process.env.GOOGLE_PLACES_API_KEY}`,
-  );
-
-  const { candidates } = await res.json();
-  return Response.json(
-    { candidates },
+  const { places } = await fetch(
+    "https://places.googleapis.com/v1/places:searchText",
     {
+      method: "POST",
       headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
+        "Content-Type": "application/json",
+        "X-Goog-FieldMask":
+          "places.displayName,places.id,places.formattedAddress",
+        "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
+      } as HeadersInit,
+      body: JSON.stringify({ textQuery: value }),
     },
-  );
+  ).then((res) => res.json());
+
+  return Response.json(places);
 }
 
 export async function POST(req: Request) {
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
     Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const R = 6371000; // EARTH'S RADIUS IN METERS
-  const radius = (R * c) / 2; // TODO: NEEDS SOME FINE TUNING
+  const radius = (R * c) / 2.3; // TODO: NEEDS SOME FINE TUNING. FIGURE THIS OUT BECAUSE THE STEPS COULD TARGET A VENUE OUT OF BOUNDS.
 
   const locationRestriction = {
     circle: {
@@ -68,10 +69,11 @@ export async function POST(req: Request) {
   } = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
     headers: {
       "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
-      "X-Goog-FieldMask": "places.id,places.location,places.primaryType,places.displayName",
+      "X-Goog-FieldMask":
+        "places.id,places.location,places.primaryType,places.displayName",
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
-    } as any,
+    } as HeadersInit,
     body: JSON.stringify({
       locationRestriction,
       includedPrimaryTypes: ["night_club"],
@@ -93,13 +95,14 @@ export async function POST(req: Request) {
   } = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
     headers: {
       "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
-      "X-Goog-FieldMask": "places.id,places.location,places.primaryType,places.displayName",
+      "X-Goog-FieldMask":
+        "places.id,places.location,places.primaryType,places.displayName",
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
-    } as any,
+    } as HeadersInit,
     body: JSON.stringify({
       locationRestriction,
-      includedPrimaryTypes: ["bar"], // FOR SOME DUMB REASON SOME RESTAURANTS SET THEMSLEVES AS BARS SO THEY'RE ALSO RETURNED
+      includedPrimaryTypes: ["bar"],
       excludedPrimaryTypes: ["restaurant"],
       languageCode: "en",
     }),

@@ -57,13 +57,15 @@ const Select: FC<Props> = ({
   const [focused, setFocused] = useState(false);
   const [debouncedValue] = useDebounceValue(value, DEFAULT_DEBOUNCE_TIME);
 
-  const { data: results, isLoading } = useSWR<{
-    candidates: Array<{
-      place_id: string;
-      formatted_address: string;
-      name: string;
-    }>;
-  }>(() => {
+  const { data: results, isLoading } = useSWR<
+    {
+      id: string;
+      formattedAddress: string;
+      displayName: {
+        text: string;
+      };
+    }[]
+  >(() => {
     if (!debouncedValue) return null;
     return `/api/venues/?value=${debouncedValue}`;
   }, fetcher);
@@ -125,22 +127,20 @@ const Select: FC<Props> = ({
       </span>
       {isLoading && <Spinner />}
       {results &&
-        results.candidates.map((result) => (
+        results.map((result) => (
           <button
             type="button"
             className="border border-black border-solid"
-            key={result.place_id}
+            key={result.id}
             onClick={() => {
               setValues(
                 "venues",
-                values.length
-                  ? [...values, result.place_id]
-                  : [result.place_id],
+                values.length ? [...values, result.id] : [result.id],
               );
               setValue("");
             }}
           >
-            {result.name} ({result.formatted_address})
+            {result.displayName.text} ({result.formattedAddress})
           </button>
         ))}
       {values.map((value, index) => (
