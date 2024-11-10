@@ -1,73 +1,63 @@
 "use client";
 import Map from "@/components/Map";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/Sidebar2";
 import { Party } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useSWR from "swr";
+import { Venue } from "./api/venues/[id]/route";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
   const [id, setId] = useState<string>("");
-  const [parties, setParties] = useState<
-    Array<Party & { Venue: { name: string } }> | undefined
-  >();
 
-  const { data: venue } = useSWR<{
-    id: string;
-    formattedAddress: string;
-    displayName: {
-      text: string;
-    };
-    shortFormattedAddress: string;
-    photos: {
-      name: string;
-    }[];
-    rating: number;
-    websiteUri: string;
-    userRatingCount: number;
-    nationalPhoneNumber: string;
-    internationalPhoneNumber: string;
-  }>(() => {
-    if (!id) return null;
-    return `/api/venues/${id}`;
-  }, fetcher);
-
-  const { data: registeredVenue } = useSWR<{
-    followers: number;
-  }>(() => {
-    if (!venue) return null;
-    return `/api/venue?venue=${venue.displayName.text.toLowerCase().replace(/\s+/g, "-")}`;
-  }, fetcher);
-
-  const { data: photos } = useSWR<Array<string>>(
+  const { data: venue } = useSWR<Venue>(
     () => {
-      if (!venue) return null;
-      return `/api/venues/photo/?NAME=${venue.photos.map(({ name }) => name).toString()}`;
+      if (!id) return null;
+      return `/api/venues/${id}`;
     },
-    (url: string) => fetch(url).then((res) => res.json()),
+    fetcher,
+    { revalidateOnFocus: false },
   );
 
-  useEffect(() => {
-    if (id) {
-      const fetchData = async () => {
-        const parties = await fetch("/api/parties", {
-          method: "POST",
-          body: JSON.stringify({ ids: [id] }),
-          headers: { "Content-Type": "application/json" },
-        }).then((res) => res.json());
-        return parties;
-      };
-      fetchData().then(setParties);
-    }
-  }, [id]);
+  const { data: parties } = useSWR<
+    Array<Party & { Venue: { name: string } }> | undefined
+  >(
+    () => {
+      if (!id) return null;
+      return "/api/parties";
+    },
+    (url: string) =>
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify({ ids: [id] }),
+        headers: { "Content-Type": "application/json" },
+      }).then((res) => res.json()),
+    { revalidateOnFocus: false },
+  );
+
+  const { data: photos, isValidating } = useSWR<string[]>(
+    () => {
+      if (!venue) return null;
+      return "/api/venues/photo";
+    },
+    (url: string) =>
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify({ photos: venue?.photos }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((res) => res.json()),
+    { revalidateOnFocus: false },
+  );
 
   return (
     <main>
       <Sidebar
-        registeredVenue={registeredVenue}
-        parties={parties}
+        isValidating={isValidating}
         photos={photos}
+        parties={parties}
         venue={venue}
         setId={setId}
       />

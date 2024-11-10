@@ -1,16 +1,17 @@
-export async function GET(req: Request) {
-  const names = new URL(req.url).searchParams.get("NAME")?.split(",");
-  const namesPromise: Array<Promise<any>> = [];
-  names?.forEach((NAME) =>
-    namesPromise.push(
+export async function POST(req: Request) {
+  const { photos }: { photos: Array<{ name: string }> } = await req.json();
+
+  const venuesPromise: Array<Promise<any>> = [];
+  photos?.forEach((photo) =>
+    venuesPromise.push(
       fetch(
-        `https://places.googleapis.com/v1/${NAME}/media?maxWidthPx=406&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
+        `https://places.googleapis.com/v1/${photo.name}/media?maxWidthPx=406&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
       ).then((res) => res.json()),
     ),
   );
 
   const photoUris: Array<{ photoUri: string }> = (
-    await Promise.all(namesPromise)
+    await Promise.all(venuesPromise)
   ).map(({ photoUri }) => photoUri);
 
   return Response.json(photoUris, {

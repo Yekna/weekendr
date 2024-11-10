@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 export async function GET(req: Request) {
   const value = new URL(req.url).searchParams.get("value");
 
+  // TODO: use locationBias because the server is somewhere in america and it's ip affects which results we return with this api
   const { places } = await fetch(
     "https://places.googleapis.com/v1/places:searchText",
     {
@@ -47,6 +48,20 @@ export async function POST(req: Request) {
   const R = 6371000; // EARTH'S RADIUS IN METERS
   const radius = (R * c) / 2.3; // TODO: NEEDS SOME FINE TUNING. FIGURE THIS OUT BECAUSE THE STEPS COULD TARGET A VENUE OUT OF BOUNDS.
 
+  //https://developers.google.com/maps/documentation/places/web-service/text-search#location-bias
+  // "locationBias": {
+  //   "rectangle": {
+  //     "low": {
+  //       "latitude": 40.477398,
+  //       "longitude": -74.259087
+  //     },
+  //     "high": {
+  //       "latitude": 40.91618,
+  //       "longitude": -73.70018
+  //     }
+  //   }
+  // }
+
   const locationRestriction = {
     circle: {
       center: {
@@ -77,7 +92,7 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       locationRestriction,
       includedPrimaryTypes: ["night_club"],
-      excludedPrimaryTypes: ["restaurant"],
+      excludedPrimaryTypes: ["restaurant", "wine_bar"],
       languageCode: "en",
     }),
     method: "POST",
@@ -103,7 +118,7 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       locationRestriction,
       includedPrimaryTypes: ["bar"],
-      excludedPrimaryTypes: ["restaurant"],
+      excludedPrimaryTypes: ["restaurant", "wine_bar"],
       languageCode: "en",
     }),
     method: "POST",

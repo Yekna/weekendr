@@ -49,7 +49,7 @@ const Map: FC<Props> = ({ setId, id }) => {
   const [venues, setVenues] = useState<Array<{
     id: string;
     location: { latitude: number; longitude: number };
-    primaryType: "night_club" | "bar";
+    primaryType: "night_club" | "bar" | "pub";
     displayName: {
       text: string;
     };
@@ -63,7 +63,7 @@ const Map: FC<Props> = ({ setId, id }) => {
 
   // TODO: Figure out a better way to loop over venues
   const genre = useCallback(
-    (id: string, primaryType: "night_club" | "bar") => {
+    (id: string, primaryType: "night_club" | "bar" | "pub") => {
       for (let i = 0; i < parties.length; i++) {
         if (parties[i].venueId === id) {
           return parties[i].genre;
