@@ -37,8 +37,6 @@ const Sidebar: FC<Props> = ({
     venue && onOpen();
   }, [venue, onOpen]);
 
-  console.log({ isValidating });
-
   return (
     <Modal
       size="xl"
@@ -49,8 +47,10 @@ const Sidebar: FC<Props> = ({
         setId("");
       }}
       scrollBehavior={"inside"}
-      backdrop="blur"
-      classNames={{ base: "sm:my-1 mb-0 sm:rounded-large rounded-b-none max-h-[544px]" }}
+      backdrop="transparent"
+      classNames={{
+        base: "sm:my-1 mb-0 sm:rounded-large rounded-b-none max-h-[544px]",
+      }}
     >
       <ModalContent>
         <ModalHeader>{venue?.displayName.text}</ModalHeader>
