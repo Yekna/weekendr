@@ -50,7 +50,7 @@ const Sidebar: FC<Props> = ({
       }}
       scrollBehavior={"inside"}
       backdrop="blur"
-      style={{ maxHeight: "544px" }}
+      classNames={{ base: "sm:my-1 mb-0 sm:rounded-large rounded-b-none max-h-[544px]" }}
     >
       <ModalContent>
         <ModalHeader>{venue?.displayName.text}</ModalHeader>
