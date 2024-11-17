@@ -16,6 +16,7 @@ export type Venue = {
   followers: number;
   parties: Party[];
   photos: Array<{ name: string }>;
+  about: string,
 };
 
 export async function GET(
@@ -31,6 +32,7 @@ export async function GET(
     select: {
       followers: true,
       parties: true,
+      about: true,
     },
   });
 
@@ -47,6 +49,7 @@ export async function GET(
     ...data,
     followers: existingVenue?.followers ?? 0,
     parties: existingVenue?.parties ?? [],
+    about: existingVenue?.about ?? "",
   } as Venue;
 
   return Response.json(venue);

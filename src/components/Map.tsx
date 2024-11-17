@@ -25,6 +25,8 @@ import { useDebounceValue } from "usehooks-ts";
 import Button from "./Button";
 import { Config, driver } from "driver.js";
 import "driver.js/dist/driver.css";
+import { DrawerTrigger } from "./ui/drawer";
+import { DialogTrigger } from "@radix-ui/react-dialog";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -33,8 +35,23 @@ type Props = {
   id: string;
 };
 
+function waitForCondition(
+  conditionFn: () => boolean,
+  interval = 100,
+): Promise<void> {
+  return new Promise((resolve) => {
+    const checkCondition = () => {
+      if (conditionFn()) {
+        resolve();
+      } else {
+        setTimeout(checkCondition, interval);
+      }
+    };
+    checkCondition();
+  });
+}
+
 const Map: FC<Props> = ({ setId, id }) => {
-  const venueRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapRef | null>(null);
   const [showTutorial, setShowTutorial] = useLocalStorage("showTutorial", true);
   const [viewport, setViewport] = useLocalStorage<ViewState | undefined>(
@@ -146,8 +163,15 @@ const Map: FC<Props> = ({ setId, id }) => {
               title: "Venue Icons",
               description:
                 "These little icons represent your local venues. Clicking on one will show more info.",
-              onNextClick: () => {
-                venueRef.current?.click();
+              onNextClick: async (e) => {
+                // TODO: Maybe instead of clicking on the ref we just use setId(id)
+                e instanceof HTMLElement && e.click();
+                // setId(venues[0].id);
+
+                await waitForCondition(
+                  () => !!document.querySelector(".step-2"),
+                );
+
                 tour.moveNext();
               },
             },
@@ -179,20 +203,16 @@ const Map: FC<Props> = ({ setId, id }) => {
             },
           },
           {
-            element: ".slider button:nth-child(3)",
-            popover: {
-              title: "Image Slider",
-              description: "Clicking on this will change the image.",
-              side: "top",
-            },
-          },
-          {
             element: ".step-5",
             popover: {
-              title: "Close sidebar button",
+              title: "Image Slider",
               description:
-                "Finally you can click on this button to close the sidebar.",
-              side: "bottom",
+                "And finally clicking on this button will shift focus to the next image in the gallery.",
+              side: "top",
+              onNextClick: () => {
+                !isSmallScreen ? tour.destroy() : tour.moveNext();
+              },
+              nextBtnText: !isSmallScreen ? "Done" : "Next →",
             },
           },
         ],
@@ -346,76 +366,153 @@ const Map: FC<Props> = ({ setId, id }) => {
           </div>
         </div>
         {venues ? (
-          venues.map((venue, index) =>
-            index ? (
-              <Marker
-                key={venue.id}
-                onClick={() => setId(venue.id)}
-                latitude={venue.location.latitude}
-                longitude={venue.location.longitude}
-              >
-                <div
-                  title={genre(venue.id, venue.primaryType)}
-                  className="flex items-center hover:cursor-pointer transition-transform text-white"
-                  style={{
-                    transform: id === venue.id ? "scale(1.2)" : "scale(1)",
-                  }}
-                >
-                  {parties.some(({ venueId }) => venueId === venue.id) ? (
-                    <Image
-                      src={url(venue.id)}
-                      alt="Genre"
-                      width={50}
-                      height={50}
-                    />
+          venues.map((venue, index) => {
+            if (isSmallScreen)
+              return (
+                <DrawerTrigger key={venue.id}>
+                  {index ? (
+                    <Marker
+                      onClick={() => setId(venue.id)}
+                      latitude={venue.location.latitude}
+                      longitude={venue.location.longitude}
+                    >
+                      <div
+                        title={genre(venue.id, venue.primaryType)}
+                        className="flex items-center hover:cursor-pointer transition-transform text-white"
+                        style={{
+                          transform:
+                            id === venue.id ? "scale(1.2)" : "scale(1)",
+                        }}
+                      >
+                        {parties.some(({ venueId }) => venueId === venue.id) ? (
+                          <Image
+                            src={url(venue.id)}
+                            alt="Genre"
+                            width={50}
+                            height={50}
+                          />
+                        ) : (
+                          <Image
+                            src={`/${venue.primaryType}.svg`}
+                            alt={venue.primaryType}
+                            width={35}
+                            height={35}
+                          />
+                        )}
+                        <span>{venue.displayName.text}</span>
+                      </div>
+                    </Marker>
                   ) : (
-                    <Image
-                      src={`/${venue.primaryType}.svg`}
-                      alt={venue.primaryType}
-                      width={35}
-                      height={35}
-                    />
+                    <Marker
+                      onClick={() => setId(venue.id)}
+                      latitude={venue.location.latitude}
+                      longitude={venue.location.longitude}
+                    >
+                      <div
+                        title={genre(venue.id, venue.primaryType)}
+                        className="flex items-center hover:cursor-pointer transition-transform text-white"
+                        style={{
+                          transform:
+                            id === venue.id ? "scale(1.2)" : "scale(1)",
+                        }}
+                      >
+                        {parties.some(({ venueId }) => venueId === venue.id) ? (
+                          <Image
+                            className="step-1"
+                            src={url(venue.id)}
+                            alt="Genre"
+                            width={50}
+                            height={50}
+                          />
+                        ) : (
+                          <Image
+                            className="step-1"
+                            src={`/${venue.primaryType}.svg`}
+                            alt={venue.primaryType}
+                            width={35}
+                            height={35}
+                          />
+                        )}
+                        <span>{venue.displayName.text}</span>
+                      </div>
+                    </Marker>
                   )}
-                  <span>{venue.displayName.text}</span>
-                </div>
-              </Marker>
-            ) : (
-              <Marker
-                key={venue.id}
-                onClick={() => setId(venue.id)}
-                latitude={venue.location.latitude}
-                longitude={venue.location.longitude}
-              >
-                <div
-                  title={genre(venue.id, venue.primaryType)}
-                  ref={venueRef}
-                  className="flex items-center hover:cursor-pointer transition-transform text-white"
-                  style={{
-                    transform: id === venue.id ? "scale(1.2)" : "scale(1)",
-                  }}
+                </DrawerTrigger>
+              );
+            if (index) {
+              return (
+                <DialogTrigger key={venue.id}>
+                  <Marker
+                    onClick={() => setId(venue.id)}
+                    latitude={venue.location.latitude}
+                    longitude={venue.location.longitude}
+                  >
+                    <div
+                      title={genre(venue.id, venue.primaryType)}
+                      className="flex items-center hover:cursor-pointer transition-transform text-white"
+                      style={{
+                        transform: id === venue.id ? "scale(1.2)" : "scale(1)",
+                      }}
+                    >
+                      {parties.some(({ venueId }) => venueId === venue.id) ? (
+                        <Image
+                          src={url(venue.id)}
+                          alt="Genre"
+                          width={50}
+                          height={50}
+                        />
+                      ) : (
+                        <Image
+                          src={`/${venue.primaryType}.svg`}
+                          alt={venue.primaryType}
+                          width={35}
+                          height={35}
+                        />
+                      )}
+                      <span>{venue.displayName.text}</span>
+                    </div>
+                  </Marker>
+                </DialogTrigger>
+              );
+            }
+            return (
+              <DialogTrigger key={venue.id}>
+                <Marker
+                  key={venue.id}
+                  onClick={() => setId(venue.id)}
+                  latitude={venue.location.latitude}
+                  longitude={venue.location.longitude}
                 >
-                  {parties.some(({ venueId }) => venueId === venue.id) ? (
-                    <Image
-                      className="step-1"
-                      src={url(venue.id)}
-                      alt="Genre"
-                      width={50}
-                      height={50}
-                    />
-                  ) : (
-                    <Image
-                      className="step-1"
-                      src={`/${venue.primaryType}.svg`}
-                      alt={venue.primaryType}
-                      width={35}
-                      height={35}
-                    />
-                  )}
-                  <span>{venue.displayName.text}</span>
-                </div>
-              </Marker>
-            ),
-          )
+                  <div
+                    title={genre(venue.id, venue.primaryType)}
+                    className="flex items-center hover:cursor-pointer transition-transform text-white"
+                    style={{
+                      transform: id === venue.id ? "scale(1.2)" : "scale(1)",
+                    }}
+                  >
+                    {parties.some(({ venueId }) => venueId === venue.id) ? (
+                      <Image
+                        className="step-1"
+                        src={url(venue.id)}
+                        alt="Genre"
+                        width={50}
+                        height={50}
+                      />
+                    ) : (
+                      <Image
+                        className="step-1"
+                        src={`/${venue.primaryType}.svg`}
+                        alt={venue.primaryType}
+                        width={35}
+                        height={35}
+                      />
+                    )}
+                    <span>{venue.displayName.text}</span>
+                  </div>
+                </Marker>
+              </DialogTrigger>
+            );
+          })
         ) : (
           <div className="absolute -translate-x-1/2 left-1/2 -translate-y-1/2 top-1/2 text-white font-extrabold">
             Loading........

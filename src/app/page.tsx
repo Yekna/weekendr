@@ -1,15 +1,17 @@
 "use client";
 import Map from "@/components/Map";
-import Sidebar from "@/components/Sidebar2";
 import { Party } from "@prisma/client";
 import { useState } from "react";
 import useSWR from "swr";
 import { Venue } from "./api/venues/[id]/route";
+import DrawerOrDialog from "@/components/Drawer";
+import { Drawer } from "@/components/ui/drawer";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
   const [id, setId] = useState<string>("");
+  const [open, setOpen] = useState(false);
 
   const { data: venue } = useSWR<Venue>(
     () => {
@@ -54,14 +56,22 @@ export default function Home() {
 
   return (
     <main>
-      <Sidebar
-        isValidating={isValidating}
-        photos={photos}
-        parties={parties}
-        venue={venue}
-        setId={setId}
-      />
-      <Map id={id} setId={setId} />
+      <Drawer
+        shouldScaleBackground={false}
+        onClose={() => setId("")}
+        open={open}
+        onOpenChange={setOpen}
+      >
+        <DrawerOrDialog
+          setOpen={setOpen}
+          open={open}
+          isValidating={isValidating}
+          photos={photos}
+          parties={parties}
+          venue={venue}
+        />
+        <Map id={id} setId={setId} />
+      </Drawer>
     </main>
   );
 }
