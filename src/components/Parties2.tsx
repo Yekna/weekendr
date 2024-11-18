@@ -13,8 +13,8 @@ type Props = {
 const Parties: FC<Props> = ({ parties, noPartiesPlaceholder }) => {
   if (!parties)
     return (
-      <main style={{ minHeight: "calc(100dvh - 64px)" }}>
-        <div>Loading...</div>
+      <main>
+        <div>Loading parties please wait...</div>
       </main>
     );
 
