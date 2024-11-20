@@ -39,9 +39,9 @@ const SkeletonContent = () => (
   <div className="flex flex-col h-[500px]">
     <Skeleton className="h-6 w-full my-4" />
     <div className="flex items-center gap-4 mx-4">
-      <Skeleton className="rounded-full h-8 w-8" />
+      <Skeleton className="rounded-full h-8 shrink-0 w-8" />
       <Skeleton className="h-[256px] w-full" />
-      <Skeleton className="rounded-full h-8 w-8" />
+      <Skeleton className="rounded-full h-8 shrink-0 w-8" />
     </div>
     <Skeleton className="h-8 w-full mt-1" />
     <Skeleton className="mt-2 h-6 w-full" />
@@ -49,8 +49,8 @@ const SkeletonContent = () => (
     <Skeleton className="h-6 mt-1" />
     <Skeleton className="h-6 mt-1" />
     <div className="flex gap-2 mt-3">
-      <Skeleton className="w-14 h-8 rounded-md" />
-      <Skeleton className="w-14 h-8 rounded-md" />
+      <Skeleton className="w-14 h-8" />
+      <Skeleton className="w-14 h-8" />
     </div>
     <Skeleton className="h-6 mt-1" />
   </div>
