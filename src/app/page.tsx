@@ -13,7 +13,7 @@ export default function Home() {
   const [id, setId] = useState<string>("");
   const [open, setOpen] = useState(false);
 
-  const { data: venue } = useSWR<Venue>(
+  const { data: venue, isValidating } = useSWR<Venue>(
     () => {
       if (!id) return null;
       return `/api/venues/${id}`;
@@ -38,22 +38,6 @@ export default function Home() {
     { revalidateOnFocus: false },
   );
 
-  const { data: photos, isValidating } = useSWR<string[]>(
-    () => {
-      if (!venue) return null;
-      return "/api/venues/photo";
-    },
-    (url: string) =>
-      fetch(url, {
-        method: "POST",
-        body: JSON.stringify({ photos: venue?.photos }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then((res) => res.json()),
-    { revalidateOnFocus: false },
-  );
-
   return (
     <main>
       <Drawer
@@ -66,7 +50,6 @@ export default function Home() {
           setOpen={setOpen}
           open={open}
           isValidating={isValidating}
-          photos={photos}
           parties={parties}
           venue={venue}
         />

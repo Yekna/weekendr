@@ -15,8 +15,8 @@ export type Venue = {
   };
   followers: number;
   parties: Party[];
-  photos: Array<{ name: string }>;
-  about: string,
+  photos: string[];
+  about: string;
 };
 
 export async function GET(
@@ -45,8 +45,22 @@ export async function GET(
     } as HeadersInit,
   }).then((res) => res.json());
 
+  const photosPromises: Array<Promise<any>> = [];
+  data.photos.map(({ name }: { name: string }) =>
+    photosPromises.push(
+      fetch(
+        `https://places.googleapis.com/v1/${name}/media?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
+      ).then((data) => data.json()),
+    ),
+  );
+
+  const photos: string[] = (await Promise.all(photosPromises)).map(
+    ({ photoUri }) => photoUri,
+  );
+
   const venue = {
     ...data,
+    photos,
     followers: existingVenue?.followers ?? 0,
     parties: existingVenue?.parties ?? [],
     about: existingVenue?.about ?? "",
