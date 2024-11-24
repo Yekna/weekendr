@@ -47,8 +47,6 @@ export default function Home() {
         onOpenChange={setOpen}
       >
         <DrawerOrDialog
-          setOpen={setOpen}
-          open={open}
           isValidating={isValidating}
           parties={parties}
           venue={venue}

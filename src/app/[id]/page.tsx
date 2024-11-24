@@ -58,10 +58,7 @@ export default async function Profile({
   const { name, picture, about } = data;
 
   return (
-    <main
-      className="max-w-7xl mx-auto p-5 sm:text-current text-sm"
-      style={{ minHeight: "calc(100dvh - 64px)" }}
-    >
+    <main className="max-w-7xl mx-auto p-5 sm:text-current text-sm min-h-screen sm:min-h-[calc(100vh-64px)]">
       <div className="flex items-center gap-3 justify-between mb-8">
         <div className="flex items-center space-x-4">
           <div className="sm:w-24 w-20 sm:h-24 h-20 rounded-full overflow-hidden">

@@ -26,7 +26,7 @@ import Button from "./Button";
 import { Config, driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { DrawerTrigger } from "./ui/drawer";
-import { DialogTrigger } from "@radix-ui/react-dialog";
+import { useSidebar } from "./ui/sidebar";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -52,6 +52,7 @@ function waitForCondition(
 }
 
 const Map: FC<Props> = ({ setId, id }) => {
+  const { toggleSidebar } = useSidebar();
   const mapRef = useRef<MapRef | null>(null);
   const [showTutorial, setShowTutorial] = useLocalStorage("showTutorial", true);
   const [viewport, setViewport] = useLocalStorage<ViewState | undefined>(
@@ -283,10 +284,7 @@ const Map: FC<Props> = ({ setId, id }) => {
   if (!data || !viewport) return;
 
   return (
-    <div
-      style={{ height: "calc(100dvh - 64px)" }}
-      className="text-black overflow-hidden"
-    >
+    <div className="text-black overflow-hidden h-screen sm:h-[calc(100vh-64px)]">
       <ReactMapGl
         style={{ position: "relative" }}
         minZoom={isSmallScreen ? 14 : 15}
@@ -330,7 +328,7 @@ const Map: FC<Props> = ({ setId, id }) => {
         }}
       >
         <div
-          className="absolute z-50 flex flex-col"
+          className="absolute z-40 flex flex-col"
           style={{
             top: isSmallScreen ? "0" : "2.5rem",
             left: isSmallScreen ? "0" : "2.5rem",
@@ -441,45 +439,12 @@ const Map: FC<Props> = ({ setId, id }) => {
               );
             if (index) {
               return (
-                <DialogTrigger key={venue.id}>
-                  <Marker
-                    onClick={() => setId(venue.id)}
-                    latitude={venue.location.latitude}
-                    longitude={venue.location.longitude}
-                  >
-                    <div
-                      title={genre(venue.id, venue.primaryType)}
-                      className="flex items-center hover:cursor-pointer transition-transform text-white"
-                      style={{
-                        transform: id === venue.id ? "scale(1.2)" : "scale(1)",
-                      }}
-                    >
-                      {parties.some(({ venueId }) => venueId === venue.id) ? (
-                        <Image
-                          src={url(venue.id)}
-                          alt="Genre"
-                          width={50}
-                          height={50}
-                        />
-                      ) : (
-                        <Image
-                          src={`/${venue.primaryType}.svg`}
-                          alt={venue.primaryType}
-                          width={35}
-                          height={35}
-                        />
-                      )}
-                      <span>{venue.displayName.text}</span>
-                    </div>
-                  </Marker>
-                </DialogTrigger>
-              );
-            }
-            return (
-              <DialogTrigger key={venue.id}>
                 <Marker
                   key={venue.id}
-                  onClick={() => setId(venue.id)}
+                  onClick={() => {
+                    setId(venue.id);
+                    toggleSidebar();
+                  }}
                   latitude={venue.location.latitude}
                   longitude={venue.location.longitude}
                 >
@@ -492,7 +457,6 @@ const Map: FC<Props> = ({ setId, id }) => {
                   >
                     {parties.some(({ venueId }) => venueId === venue.id) ? (
                       <Image
-                        className="step-1"
                         src={url(venue.id)}
                         alt="Genre"
                         width={50}
@@ -500,7 +464,6 @@ const Map: FC<Props> = ({ setId, id }) => {
                       />
                     ) : (
                       <Image
-                        className="step-1"
                         src={`/${venue.primaryType}.svg`}
                         alt={venue.primaryType}
                         width={35}
@@ -510,7 +473,45 @@ const Map: FC<Props> = ({ setId, id }) => {
                     <span>{venue.displayName.text}</span>
                   </div>
                 </Marker>
-              </DialogTrigger>
+              );
+            }
+            return (
+              <Marker
+                key={venue.id}
+                onClick={() => {
+                  setId(venue.id);
+                  toggleSidebar();
+                }}
+                latitude={venue.location.latitude}
+                longitude={venue.location.longitude}
+              >
+                <div
+                  title={genre(venue.id, venue.primaryType)}
+                  className="flex items-center hover:cursor-pointer transition-transform text-white"
+                  style={{
+                    transform: id === venue.id ? "scale(1.2)" : "scale(1)",
+                  }}
+                >
+                  {parties.some(({ venueId }) => venueId === venue.id) ? (
+                    <Image
+                      className="step-1"
+                      src={url(venue.id)}
+                      alt="Genre"
+                      width={50}
+                      height={50}
+                    />
+                  ) : (
+                    <Image
+                      className="step-1"
+                      src={`/${venue.primaryType}.svg`}
+                      alt={venue.primaryType}
+                      width={35}
+                      height={35}
+                    />
+                  )}
+                  <span>{venue.displayName.text}</span>
+                </div>
+              </Marker>
             );
           })
         ) : (

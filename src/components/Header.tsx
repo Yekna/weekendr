@@ -1,11 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useSidebarContext } from "@/providers/SidebarProvider";
 import { auth } from "@/auth";
 
 const Header = async () => {
-  const session = await auth();
+  const data = await auth();
+
   return (
-    <header className="z-50 fixed bottom-0 left-0 right-0 sm:static bg-gray-800 px-6 flex items-center justify-between h-16">
+    <header
+      style={{ transition: "bottom 0.2s ease-in" }}
+      className="z-50 fixed bottom-0 left-0 right-0 sm:static bg-gray-800 px-6 hidden sm:flex items-center justify-between h-16"
+    >
       <Link href="/">
         <Image
           priority={true}
@@ -17,10 +23,10 @@ const Header = async () => {
       </Link>
       <nav>
         <ul className="flex gap-3 items-center sm:text-base text-sm">
-          {session ? (
+          {data ? (
             <>
               <li>
-                <Link href="/profile">{session.user?.name}</Link>
+                <Link href="/profile">{data?.user?.name}</Link>
               </li>
               <li>
                 <Link href="/api/auth/signout">Logout</Link>

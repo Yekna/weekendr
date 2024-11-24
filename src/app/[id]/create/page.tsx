@@ -72,10 +72,7 @@ export default function CreateParty() {
   }
 
   return (
-    <main
-      className="max-w-7xl grid sm:grid-cols-2 place-items-center mx-auto gap-5 px-5"
-      style={{ minHeight: "calc(100dvh - 64px)" }}
-    >
+    <main className="max-w-7xl grid sm:grid-cols-2 place-items-center mx-auto gap-5 px-5 min-h-screen sm:min-h-[calc(100vh-64px)]">
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-3 w-full overflow-x-hidden"

@@ -13,10 +13,7 @@ export default function Premium() {
 
   return (
     <PayPalProvider>
-      <main
-        className="[&>*]:flex-1 max-w-[1280px] mx-auto p-5 flex sm:flex-row flex-col gap-5 justify-center items-center"
-        style={{ minHeight: "calc(100dvh - 64px)" }}
-      >
+      <main className="[&>*]:flex-1 max-w-[1280px] mx-auto p-5 flex sm:flex-row flex-col gap-5 justify-center items-center min-h-screen sm:min-h-[calc(100vh-64px)]">
         {isSmallScreen ? (
           <div className="flex flex-col justify-center">
             <h1 className="text-xl mb-3">

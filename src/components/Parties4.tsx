@@ -40,7 +40,9 @@ const Parties: FC<Props> = ({ id, noPartiesPlaceholder }) => {
   }, [party, onOpen]);
 
   if (!parties)
-    return <div style={{ minHeight: "calc(100dvh - 64px)" }}>Loading...</div>;
+    return (
+      <div>Loading...</div>
+    );
 
   return (
     <>

@@ -145,6 +145,10 @@ export async function POST(req: Request) {
   const processedVenueIds = new Set();
   const partyPromises = [];
 
+  let lte = new Date();
+  lte.setDate(new Date().getDate() + 7);
+  const gte = new Date();
+
   // return only the first instance of a venueId that's valid
   for (let venueId of venueIds) {
     if (!processedVenueIds.has(venueId)) {
@@ -152,7 +156,8 @@ export async function POST(req: Request) {
         where: {
           venueId,
           date: {
-            gte: new Date(),
+            gte,
+            lte,
           },
         },
         orderBy: {

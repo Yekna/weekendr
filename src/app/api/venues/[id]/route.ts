@@ -17,6 +17,7 @@ export type Venue = {
   parties: Party[];
   photos: string[];
   about: string;
+  primaryType: string;
 };
 
 export async function GET(
@@ -40,10 +41,12 @@ export async function GET(
     headers: {
       "Content-Type": "application/json",
       "X-Goog-FieldMask":
-        "displayName,photos,formattedAddress,id,internationalPhoneNumber,rating,websiteUri,userRatingCount,location",
+        "displayName,photos,formattedAddress,id,internationalPhoneNumber,rating,websiteUri,userRatingCount,location,primaryType",
       "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
     } as HeadersInit,
   }).then((res) => res.json());
+
+  console.log({ data });
 
   const photosPromises: Array<Promise<any>> = [];
   data.photos.map(({ name }: { name: string }) =>

@@ -23,10 +23,7 @@ export default async function Profile() {
   ).then((res) => res.json());
 
   return (
-    <main
-      style={{ minHeight: "calc(100dvh - 64px)" }}
-      className="mx-auto max-w-[1280px] w-4/5 pt-3"
-    >
+    <main className="mx-auto max-w-[1280px] w-4/5 pt-3 min-h-screen sm:min-h-[calc(100vh-64px)]">
       <ProfileFilter venues={venues} />
     </main>
   );
