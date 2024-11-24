@@ -1,7 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { useSidebarContext } from "@/providers/SidebarProvider";
 import { auth } from "@/auth";
 
 const Header = async () => {
