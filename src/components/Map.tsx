@@ -284,7 +284,7 @@ const Map: FC<Props> = ({ setId, id }) => {
   if (!data || !viewport) return;
 
   return (
-    <div className="text-black overflow-hidden h-screen sm:h-[calc(100vh-64px)]">
+    <div className="text-black overflow-hidden h-[100dvh] sm:h-[calc(100vh-64px)]">
       <ReactMapGl
         style={{ position: "relative" }}
         minZoom={isSmallScreen ? 14 : 15}
