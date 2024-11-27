@@ -46,8 +46,6 @@ export async function GET(
     } as HeadersInit,
   }).then((res) => res.json());
 
-  console.log({ data });
-
   const photosPromises: Array<Promise<any>> = [];
   data.photos.map(({ name }: { name: string }) =>
     photosPromises.push(

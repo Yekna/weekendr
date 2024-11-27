@@ -2,7 +2,6 @@ import bcrypt from "bcryptjs";
 import prisma from "../../../../prisma/client";
 import nodemailer from "nodemailer";
 import { z } from "zod";
-import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const {
@@ -163,17 +162,13 @@ export async function PATCH(req: Request) {
       `${process.env.WEBSITE_URL}/api/venues/${id}`,
     ).then((res) => res.json());
 
-    const googlePlacesVenueImage = await fetch(
-      `https://places.googleapis.com/v1/${googlePlacesVenue.photos[0].name}/media?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
-    ).then((res) => res.json());
-
     await prisma.venue.create({
       data: {
         address: googlePlacesVenue.formattedAddress,
         id: googlePlacesVenue.id,
         name: googlePlacesVenue.displayName.text,
         phone: googlePlacesVenue.internationalPhoneNumber || "",
-        picture: googlePlacesVenueImage.photoUri,
+        picture: googlePlacesVenue.photos[0],
         rating: googlePlacesVenue.rating || 0,
         website: googlePlacesVenue.websiteUri || "",
         ratingsCount: googlePlacesVenue.userRatingCount || 0,

@@ -53,6 +53,9 @@ export default function ProfileStatistics({ id }: { id: string }) {
                     followers: venue.followers,
                     following,
                   }),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
                 });
 
                 if (res.ok) {
