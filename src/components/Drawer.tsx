@@ -218,7 +218,7 @@ export default function DrawerOrDialog({
 
   if (isDesktop) {
     return (
-      <Sidebar>
+      <Sidebar className="step-2">
         <SidebarContent>
           {isValidating ? (
             <SkeletonContent />
