@@ -19,11 +19,7 @@ import Image from "next/image";
 import { Venue } from "@/app/api/venues/[id]/route";
 import Parties from "./Parties2";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  SidebarContent,
-  Sidebar,
-  useSidebar,
-} from "@/components/ui/sidebar";
+import { SidebarContent, Sidebar, useSidebar } from "@/components/ui/sidebar";
 import Bookmark from "./Icons/Bookmark";
 import Profile from "./Icons/Profile";
 import Link from "next/link";
@@ -127,7 +123,14 @@ const Content = ({
         <span></span>
         <div className="flex items-center gap-1">
           <Location />
-          {venue?.formattedAddress}
+          <Link
+            title="Get Directions"
+            className="hover:underline"
+            target="_blank"
+            href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${venue?.formattedAddress}`}
+          >
+            {venue?.formattedAddress}
+          </Link>
         </div>
         {venue?.websiteUri && (
           <div className="flex items-center gap-1">

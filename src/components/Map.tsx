@@ -363,8 +363,8 @@ const Map: FC<Props> = ({ setId, id }) => {
               ))}
           </div>
         </div>
-        {venues ? (
-          venues.map((venue, index) => {
+        {!revalidate && venues !== null ? (
+          venues?.map((venue, index) => {
             if (isSmallScreen)
               return (
                 <DrawerTrigger key={venue.id}>
