@@ -50,7 +50,7 @@ export async function GET(
   data.photos.map(({ name }: { name: string }) =>
     photosPromises.push(
       fetch(
-        `https://places.googleapis.com/v1/${name}/media?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
+        `https://places.googleapis.com/v1/${name}/media?maxHeightPx=256&maxWidthPx=448&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
       ).then((data) => data.json()),
     ),
   );

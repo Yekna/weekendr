@@ -71,7 +71,7 @@ export async function POST(req: Request) {
       venue.photos
         ? photosPromises.push(
             fetch(
-              `https://places.googleapis.com/v1/${venue.photos[0].name}/media?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
+              `https://places.googleapis.com/v1/${venue.photos[0].name}/media?maxHeightPx=256&maxWidthPx=448&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
             ).then((data) => data.json()),
           )
         : photosPromises.push(
@@ -231,7 +231,7 @@ export async function GET(req: Request) {
     const [data] = places;
 
     const googlePlacesVenueImage = await fetch(
-      `https://places.googleapis.com/v1/${data.photos[0].name}/media?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
+      `https://places.googleapis.com/v1/${data.photos[0].name}/media?maxHeightPx=256&maxWidthPx=448&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
     ).then((res) => res.json());
 
     const venue = {

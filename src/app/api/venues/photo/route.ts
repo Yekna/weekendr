@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   photos?.forEach((photo) =>
     venuesPromise.push(
       fetch(
-        `https://places.googleapis.com/v1/${photo.name}/media?maxWidthPx=406&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
+        `https://places.googleapis.com/v1/${photo.name}/media?maxWidthPx=448&skipHttpRedirect=true&key=${process.env.GOOGLE_PLACE_NEW_API_KEY}`,
       ).then((res) => res.json()),
     ),
   );
