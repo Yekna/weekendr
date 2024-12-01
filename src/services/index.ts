@@ -14,9 +14,9 @@ export async function getLimitedVenue(
   });
 
   if (!venue) {
-    const locationBias = cookies().get("viewport");
+    const viewport = cookies().get("viewport");
 
-    if (!locationBias) {
+    if (!viewport) {
       const { places } = await fetch(
         "https://places.googleapis.com/v1/places:searchText",
         {
@@ -56,7 +56,10 @@ export async function getLimitedVenue(
             "X-Goog-FieldMask": "places.displayName,places.photos",
             "X-Goog-Api-Key": process.env.GOOGLE_PLACE_NEW_API_KEY,
           } as HeadersInit,
-          body: JSON.stringify({ textQuery: slug, locationBias }),
+          body: JSON.stringify({
+            textQuery: slug,
+            locationBias: JSON.parse(viewport.value),
+          }),
         },
       ).then((res) => res.json());
 
