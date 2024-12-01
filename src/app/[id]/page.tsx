@@ -12,13 +12,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = params;
 
+  const decodedId = decodeURIComponent(id);
+
   if (id === "service-worker.js" || id === "installHook.js.map") {
     return {
       title: "Service Worker",
     };
   }
 
-  const data = await getLimitedVenue(id, {
+  const data = await getLimitedVenue(decodedId, {
     parties: { select: { id: true } },
     followers: true,
     name: true,
@@ -31,7 +33,7 @@ export async function generateMetadata({
     description: `${data.followers} Followers, ${data.parties.length} Posts - ${data.name} (@${data.slug}) on Weekendr${data?.about ? `: "${data.about}"` : ""}`,
     metadataBase: new URL(process.env.WEBSITE_URL as string),
     openGraph: {
-      url: `${process.env.WEBSITE_URL}/${id}`,
+      url: `${process.env.WEBSITE_URL}/${decodedId}`,
       siteName: "Weekendr",
       type: "profile",
       description: `${data.followers} Followers, ${data.parties.length} Posts - See Upcoming Parties from ${data.name} (@${data.slug})`,
@@ -48,7 +50,9 @@ export default async function Profile({
 
   if (id === "service-worker.js" || id === "installHook.js.map") return;
 
-  const data = await getLimitedVenue(id, {
+  const decodedId = decodeURIComponent(id);
+
+  const data = await getLimitedVenue(decodedId, {
     name: true,
     picture: true,
     about: true,
@@ -72,14 +76,14 @@ export default async function Profile({
           </div>
           <div className="grid" style={{ gridTemplateRows: "auto auto 56px" }}>
             <h2 className="text-2xl font-bold">{name}</h2>
-            <ProfileStatistics id={id} />
+            <ProfileStatistics id={decodedId} />
           </div>
         </div>
       </div>
       <div className="mb-8">
         <p>{about}</p>
       </div>
-      <Parties id={id} noPartiesPlaceholder="No Posts Yet" />
+      <Parties id={decodedId} noPartiesPlaceholder="No Posts Yet" />
     </main>
   );
 }

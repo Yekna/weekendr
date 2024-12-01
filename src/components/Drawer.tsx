@@ -26,6 +26,7 @@ import Link from "next/link";
 import Website from "./Icons/Website";
 import Location from "./Icons/Location";
 import Phone from "./Icons/Phone";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Props = {
   venue?: Venue;
@@ -65,6 +66,7 @@ const Content = ({
   parties?: Array<Party & { Venue: { name: string } }>;
 }) => {
   const { toggleSidebar, state } = useSidebar();
+  const isMobile = useIsMobile()
   return (
     <>
       <Carousel>
@@ -193,7 +195,7 @@ const Content = ({
           <Button
             className="bg-gray-200 text-gray-700"
             href={`/${venue?.displayName.text.toLowerCase().replace(/\s+/g, "-")}`}
-            onClick={() => state === "expanded" && toggleSidebar()}
+            onClick={() => !isMobile && toggleSidebar()}
           >
             <Profile />
             Profile
