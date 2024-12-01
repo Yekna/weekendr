@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     siteName: "Weekendr",
     type: "website",
   },
-  title: "Weekendr - Find venues near you",
+  title: "Weekendr - Find Clubs And Bars Near You",
   description: "Find clubs and bars near you",
   // metadataBase adds a prefix to the opengraph-image.png e.g [https://weekendr.club]/opengraph-image.png
   metadataBase: new URL(process.env.WEBSITE_URL as string),
