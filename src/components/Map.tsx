@@ -53,7 +53,8 @@ function waitForCondition(
 
 const Map: FC<Props> = ({ setId, id }) => {
   const { toggleSidebar } = useSidebar();
-  const mapRef = useRef<MapRef | null>(null);
+  const mapRef = useRef<MapRef>(null);
+  const controllerRef = useRef<AbortController>();
   const [showTutorial, setShowTutorial] = useLocalStorage("showTutorial", true);
   const [viewport, setViewport] = useLocalStorage<ViewState | undefined>(
     "viewport",
@@ -251,10 +252,10 @@ const Map: FC<Props> = ({ setId, id }) => {
   }, [revalidate]);
 
   useEffect(() => {
-    if (!viewport) {
+    if (!viewport && mapRef.current) {
       fetch("https://ipapi.co/json/")
         .then((res) => res.json())
-        .then((data) =>
+        .then((data) => {
           setViewport(() => ({
             latitude: data.latitude,
             longitude: data.longitude,
@@ -267,8 +268,26 @@ const Map: FC<Props> = ({ setId, id }) => {
               left: 0,
               right: 0,
             },
-          })),
-        );
+          }));
+
+          if (controllerRef.current) {
+            controllerRef.current.abort();
+          }
+
+          controllerRef.current = new AbortController();
+          const { signal } = controllerRef.current;
+
+          fetch("/api/location", {
+            method: "POST",
+            body: JSON.stringify({
+              viewport: mapRef.current?.getMap().getBounds(),
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            signal,
+          }).catch(() => {});
+        });
     }
   }, [viewport, setViewport]);
 
@@ -277,6 +296,24 @@ const Map: FC<Props> = ({ setId, id }) => {
       setViewport((v) => v && { ...v, latitude, longitude });
       setLocation("");
       setRevalidate(true);
+
+      if (controllerRef.current) {
+        controllerRef.current.abort();
+      }
+
+      controllerRef.current = new AbortController();
+      const { signal } = controllerRef.current;
+
+      fetch("/api/location", {
+        method: "POST",
+        body: JSON.stringify({
+          viewport: mapRef.current?.getMap().getBounds(),
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        signal,
+      }).catch(() => {});
     },
     [setViewport],
   );
@@ -308,6 +345,24 @@ const Map: FC<Props> = ({ setId, id }) => {
             const { places, parties } = await res.json();
             setVenues(places);
             setParties(parties);
+
+            if (controllerRef.current) {
+              controllerRef.current.abort();
+            }
+
+            controllerRef.current = new AbortController();
+            const { signal } = controllerRef.current;
+
+            fetch("/api/location", {
+              method: "POST",
+              body: JSON.stringify({
+                viewport: mapRef.current?.getMap().getBounds(),
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+              signal,
+            }).catch(() => {});
           }
         }}
         onMoveEnd={async () => {
@@ -324,6 +379,24 @@ const Map: FC<Props> = ({ setId, id }) => {
             const { places, parties } = await res.json();
             setVenues(places);
             setParties(parties);
+
+            if (controllerRef.current) {
+              controllerRef.current.abort();
+            }
+
+            controllerRef.current = new AbortController();
+            const { signal } = controllerRef.current;
+
+            fetch("/api/location", {
+              method: "POST",
+              body: JSON.stringify({
+                viewport: mapRef.current?.getMap().getBounds(),
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+              signal,
+            }).catch(() => {});
           }
         }}
       >
